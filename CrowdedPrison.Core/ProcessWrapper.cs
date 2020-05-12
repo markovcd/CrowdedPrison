@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
-  public class ProcessWrapper : IProcess, IDisposable
+  public class ProcessWrapper : IProcess
   {
     private TaskCompletionSource<object> tcs;
     private readonly Process process;
@@ -72,14 +72,6 @@ namespace CrowdedPrison.Core
       tcs = null;
       process.WaitForExit();
     }
-
-    public void Dispose()
-    {
-      process.Dispose();
-    }
-
-
-
 
     private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
     {
