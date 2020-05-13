@@ -5,20 +5,6 @@ using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
-  public class OutputData
-  {
-    public string Data { get; }
-    public bool IsError { get; }
-    public DateTime Timestamp { get; }
-
-    public OutputData(string data, bool isError = false)
-    {
-      Data = data;
-      IsError = isError;
-      Timestamp = DateTime.Now;
-    }
-  }
-
   public class ProcessWrapper : IProcess
   {
     private TaskCompletionSource<object> tcs;
@@ -91,14 +77,20 @@ namespace CrowdedPrison.Core
       process.WaitForExit();
     }
 
+    private void AddData(string data, bool isError = false)
+    {
+      if (!string.IsNullOrEmpty(data))
+        asyncStream.Add(new OutputData(data, isError));
+    }
+
     private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
     {
-      asyncStream.Add(new OutputData(e.Data));
+      AddData(e.Data);
     }
 
     private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
     {
-      asyncStream.Add(new OutputData(e.Data, true));
+      AddData(e.Data, true);
     }
 
     private void Process_Exited(object sender, EventArgs e)
