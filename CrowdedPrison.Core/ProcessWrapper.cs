@@ -1,16 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
+  public class OutputData
+  {
+    public string Data { get; }
+    public bool IsError { get; }
+    public DateTime Timestamp { get; }
+
+    public OutputData(string data, bool isError = false)
+    {
+      Data = data;
+      IsError = isError;
+      Timestamp = DateTime.Now;
+    }
+  }
+
   public class ProcessWrapper : IProcess
   {
     private TaskCompletionSource<object> tcs;
     private readonly Process process;
+    private readonly AsyncStream<OutputData> asyncStream;
+    public IAsyncEnumerable<OutputData> AsyncDataStream => asyncStream;
 
     public ProcessWrapper(string fileName, string arguments)
     {
+      asyncStream = new AsyncStream<OutputData>();
       var startInfo = CreateStartInfo(fileName, arguments);
       process = CreateProcess(startInfo);
     }
@@ -30,16 +48,16 @@ namespace CrowdedPrison.Core
 
     private Process CreateProcess(ProcessStartInfo startInfo)
     {
-      var process = new Process
+      var p = new Process
       {
         StartInfo = startInfo,
         EnableRaisingEvents = true
       };
 
-      process.ErrorDataReceived += Process_ErrorDataReceived;
-      process.Exited += Process_Exited;
-      process.OutputDataReceived += Process_OutputDataReceived;
-      return process;
+      p.Exited += Process_Exited;
+      p.ErrorDataReceived += Process_ErrorDataReceived;
+      p.OutputDataReceived += Process_OutputDataReceived;
+      return p;
     }
 
     public bool Start()
@@ -75,16 +93,17 @@ namespace CrowdedPrison.Core
 
     private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
     {
-
+      asyncStream.Add(new OutputData(e.Data));
     }
 
     private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
     {
-
+      asyncStream.Add(new OutputData(e.Data, true));
     }
 
     private void Process_Exited(object sender, EventArgs e)
     {
+      asyncStream.Finish();
       tcs?.TrySetResult(default);
     }
 
