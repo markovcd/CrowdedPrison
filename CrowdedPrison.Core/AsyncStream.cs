@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,15 +7,13 @@ using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
-  public class AsyncStream<T> : IAsyncEnumerable<T>
+  public class AsyncStream<T> : IAsyncEnumerable<T>, IEnumerable<T>
   {
     private readonly List<T> list = new List<T>();
     private bool isFinished;
 
     private event EventHandler<T> Added;
     private event EventHandler Finished;
-
-    public IReadOnlyList<T> Items => list.ToList().AsReadOnly();
 
     public void Add(T data)
     {
@@ -87,6 +86,16 @@ namespace CrowdedPrison.Core
         stream.Finished -= Stream_Finished;
         position = -1;
       }
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+      return list.ToList().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return GetEnumerator();
     }
   }
 }
