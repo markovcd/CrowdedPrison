@@ -5,19 +5,15 @@ using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
-  public class ProcessWrapper : IProcess
+  public class AsyncProcess : IAsyncProcess, IDisposable
   {
     private TaskCompletionSource<object> tcs;
-    private readonly Process process;
-    private readonly AsyncStream<OutputData> asyncStream;
+    private Process process;
+    private bool started;
+    private readonly AsyncStream<OutputData> asyncStream = new AsyncStream<OutputData>();
+
     public IAsyncEnumerable<OutputData> AsyncDataStream => asyncStream;
 
-    public ProcessWrapper(string fileName, string arguments)
-    {
-      asyncStream = new AsyncStream<OutputData>();
-      var startInfo = CreateStartInfo(fileName, arguments);
-      process = CreateProcess(startInfo);
-    }
 
     private static ProcessStartInfo CreateStartInfo(string fileName, string arguments)
     {
@@ -27,6 +23,7 @@ namespace CrowdedPrison.Core
         FileName = fileName,
         RedirectStandardOutput = true,
         RedirectStandardError = true,
+        RedirectStandardInput = true,
         CreateNoWindow = true,
         UseShellExecute = false,
       };
@@ -46,12 +43,24 @@ namespace CrowdedPrison.Core
       return p;
     }
 
-    public bool Start()
+    public bool Start(string fileName, string arguments = default)
     {
+      if (started) throw new InvalidOperationException("Process already started");
+
+      var startInfo = CreateStartInfo(fileName, arguments);
+      process = CreateProcess(startInfo);
       var result =  process.Start();
       process.BeginOutputReadLine();
       process.BeginErrorReadLine();
+
+      started = true;
       return result;
+    }
+
+    public async Task WriteToInputAsync(string command)
+    {
+      var sw = process.StandardInput;
+      await sw.WriteLineAsync(command);
     }
 
     public void Kill()
@@ -60,14 +69,6 @@ namespace CrowdedPrison.Core
       process.CancelOutputRead();
       process.Kill();
     }
-
-    public void Close()
-    {
-      process.CancelErrorRead();
-      process.CancelOutputRead();
-      process.Close();
-    }
-
 
     public async Task WaitForExitAsync()
     {
@@ -99,5 +100,9 @@ namespace CrowdedPrison.Core
       tcs?.TrySetResult(default);
     }
 
+    public void Dispose()
+    {
+      process.Dispose();
+    }
   }
 }

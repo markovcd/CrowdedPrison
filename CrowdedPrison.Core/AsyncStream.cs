@@ -78,13 +78,12 @@ namespace CrowdedPrison.Core
         return !stream.isFinished;
       }
 
-#pragma warning disable CS1998
-      async ValueTask IAsyncDisposable.DisposeAsync()
-#pragma warning restore CS1998
+      ValueTask IAsyncDisposable.DisposeAsync()
       {
         stream.Added -= Stream_Added;
         stream.Finished -= Stream_Finished;
         position = -1;
+        return default;
       }
     }
 
