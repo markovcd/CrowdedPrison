@@ -8,23 +8,15 @@ namespace ConsoleApp2
   {
     static async Task Main(string[] args)
     {
-      //var p = new AsyncProcess();
-      //p.Start(@"C:\Users\armw\source\repos\CrowdedPrison\ConsoleApp1\bin\Debug\netcoreapp3.1\ConsoleApp1.exe");
+      var username = "testowy";
 
-      //await p.WriteToInputAsync("wrote line 1");
-      //Console.WriteLine("wrote line 1");
+      var gpg = new GpgWrapper(() => new AsyncProcess(), new FileSystem());
 
-      //await p.WriteToInputAsync("wrote line 2");
-      //Console.WriteLine("wrote line 2");
+      var encrypted = await gpg.EncryptAsync("czesc", username);
+      var decrypted = await gpg.DecryptAsync(encrypted);
 
-      //await foreach (var d in p.AsyncDataStream)
-      //{
-      //  Console.WriteLine($"Data: {d.Data} - {d.IsError}");
-      //}
-
-      //var gpg = new GpgWrapper(() => new AsyncProcess());
-      //var s = await gpg.GenerateKeyAsync("aaa");
-      //Console.WriteLine(s);
+      Console.WriteLine(encrypted);
+      Console.WriteLine(decrypted);
     }
   }
 }

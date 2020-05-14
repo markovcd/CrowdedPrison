@@ -40,17 +40,17 @@ namespace CrowdedPrison.Core
 
     public Task<bool> EncryptFileAsync(string inputFileName, string outputFileName, string name)
     {
-      return RunCommandAsync($"--output {outputFileName} --encrypt --recipient {name} {inputFileName}");
+      return RunCommandAsync($"--armor --output {outputFileName} --encrypt --recipient {name} {inputFileName}");
     }
 
     public Task<bool> DecryptFileAsync(string inputFileName, string outputFileName)
     {
-      return RunCommandAsync($"--output {outputFileName} --decrypt {inputFileName}");
+      return RunCommandAsync($"--armor --output {outputFileName} --decrypt {inputFileName}");
     }
 
     public Task<bool> ImportKeyFromFileAsync(string fileName)
     {
-      return RunCommandAsync($"--import \"{fileName}\"");
+      return RunCommandAsync($"--armor --import \"{fileName}\"");
     }
 
     public Task<bool> ExportKeyToFileAsync(string fileName, string name)
