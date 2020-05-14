@@ -22,9 +22,9 @@ namespace ConsoleApp2
       //  Console.WriteLine($"Data: {d.Data} - {d.IsError}");
       //}
 
-      var gpg = new GpgWrapper(() => new AsyncProcess());
-      var s = await gpg.GenerateKey("aaa");
-      Console.WriteLine(s);
+      //var gpg = new GpgWrapper(() => new AsyncProcess());
+      //var s = await gpg.GenerateKeyAsync("aaa");
+      //Console.WriteLine(s);
     }
   }
 }
