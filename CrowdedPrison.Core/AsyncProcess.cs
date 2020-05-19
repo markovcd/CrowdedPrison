@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
@@ -9,14 +10,18 @@ namespace CrowdedPrison.Core
   {
     private TaskCompletionSource<object> tcs;
     private Process process;
-
+    private readonly List<OutputData> dataList = new List<OutputData>();
     public ProcessState State { get; private set; }
 
     private readonly AsyncStream<OutputData> asyncStream = new AsyncStream<OutputData>();
 
     public IAsyncEnumerable<OutputData> AsyncDataStream => asyncStream;
+    public IReadOnlyList<OutputData> Data => dataList;
 
     public int ExitCode => process.ExitCode;
+    public string ErrorText => AggregateData(true);
+    public string OutputText => AggregateData();
+
 
     public bool Start(string fileName, string arguments = default)
     {
@@ -59,10 +64,17 @@ namespace CrowdedPrison.Core
       process.Dispose();
     }
 
+    private string AggregateData(bool isError = false)
+    {
+      return Data.Where(d => d.IsError == isError).Select(d => d.Data).Aggregate((a, b) => $"{a}\r\n{b}");
+    }
+
     private void AddData(string data, bool isError = false)
     {
-      if (!string.IsNullOrEmpty(data))
-        asyncStream.Add(new OutputData(data, isError));
+      if (string.IsNullOrEmpty(data)) return;
+      var o = new OutputData(data, isError);
+      asyncStream.Add(o);
+      dataList.Add(o);
     }
 
     private static ProcessStartInfo CreateStartInfo(string fileName, string arguments)

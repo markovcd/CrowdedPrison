@@ -18,10 +18,10 @@ namespace CrowdedPrison.Core
       File.Delete(fileName);
     }
 
-    public Task<string> ReadAllTextAsync(string fileName)
+    public async Task<string> ReadAllTextAsync(string fileName)
     {
       using var streamReader = new StreamReader(fileName);
-      return streamReader.ReadToEndAsync();
+      return await streamReader.ReadToEndAsync();
     }
 
     public async Task WriteAllTextAsync(string fileName, string text)

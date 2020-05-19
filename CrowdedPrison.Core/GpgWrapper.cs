@@ -1,13 +1,22 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Starksoft.Aspen.GnuPG;
 
 namespace CrowdedPrison.Core
 {
+  public class GpgException : Exception
+  {
+    public GpgException(string message) : base(message) { }
+  }
+
   public class GpgWrapper : IGpg
   {
     private readonly Func<IAsyncProcess> processFactory;
     private readonly IFileSystem fileSystem;
-    public string GpgPath => @"C:\Users\armw\Desktop\gpg\gpg.exe";
+
+    public string GpgPath { get; set; } = @"C:\Users\armw\Desktop\gpg\gpg.exe";
+    public string HomeDir { get; set; }
 
     public GpgWrapper(Func<IAsyncProcess> processFactory, IFileSystem fileSystem)
     {
@@ -113,19 +122,22 @@ namespace CrowdedPrison.Core
       }
     }
 
-    public async Task<bool> RunCommandAsync(string command, string input = null, string homedir = null)
+    public async Task<bool> RunCommandAsync(string command, string input = null)
     {
       var p = processFactory();
       using (p as IDisposable)
       {
-        if (homedir != null) command = $"--homedir {homedir} {command}";
+        if (!string.IsNullOrEmpty(HomeDir)) command = $"--homedir {HomeDir} {command}";
         p.Start(GpgPath, command);
 
         if (input != null) await p.WriteToInputAsync(input);
 
         await p.WaitForExitAsync();
 
-        return p.ExitCode == 0;
+        if (string.IsNullOrWhiteSpace(p.ErrorText)) return p.ExitCode == 0;
+
+
+        throw new GpgException(p.ErrorText);
       }
     }
   }
