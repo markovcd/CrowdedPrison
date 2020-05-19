@@ -1,10 +1,12 @@
-﻿namespace CrowdedPrison.Core
+﻿using System.Threading.Tasks;
+
+namespace CrowdedPrison.Core
 {
   public interface IFileSystem
   {
     string GetTempFilePath();
-    string ReadAllText(string fileName);
     void DeleteFile(string fileName);
-    void WriteAllText(string fileName, string text);
+    Task<string> ReadAllTextAsync(string fileName);
+    Task WriteAllTextAsync(string fileName, string text);
   }
 }

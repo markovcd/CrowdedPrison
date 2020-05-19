@@ -8,15 +8,13 @@ namespace ConsoleApp2
   {
     static async Task Main(string[] args)
     {
-      var username = "testowy";
+      var username = "testowy2";
 
       var gpg = new GpgWrapper(() => new AsyncProcess(), new FileSystem());
 
-      var encrypted = await gpg.EncryptAsync("czesc", username);
-      var decrypted = await gpg.DecryptAsync(encrypted);
+      var result = await gpg.RunCommandAsync($"--delete-secret-key {username}");
 
-      Console.WriteLine(encrypted);
-      Console.WriteLine(decrypted);
+      Console.WriteLine(result);
     }
   }
 }

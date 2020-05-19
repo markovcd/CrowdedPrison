@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
+
   public class FileSystem : IFileSystem
   {
     public string GetTempFilePath()
@@ -11,19 +13,21 @@ namespace CrowdedPrison.Core
       return Path.Combine(tempPath, randomName);
     }
 
-    public string ReadAllText(string fileName)
-    {
-      return File.ReadAllText(fileName);
-    }
-
     public void DeleteFile(string fileName)
     {
       File.Delete(fileName);
     }
 
-    public void WriteAllText(string fileName, string text)
+    public Task<string> ReadAllTextAsync(string fileName)
     {
-      File.WriteAllText(fileName, text);
+      using var streamReader = new StreamReader(fileName);
+      return streamReader.ReadToEndAsync();
+    }
+
+    public async Task WriteAllTextAsync(string fileName, string text)
+    {
+      using var streamWriter = new StreamWriter(fileName);
+      await streamWriter.WriteAsync(text);
     }
   }
 }
