@@ -15,7 +15,7 @@ namespace CrowdedPrison.Core
     private readonly Func<IAsyncProcess> processFactory;
     private readonly IFileSystem fileSystem;
 
-    public string GpgPath { get; set; } = @"C:\Users\armw\Desktop\gpg\gpg.exe";
+    public string GpgPath { get; set; } = @"C:\Users\marko\Desktop\GnuPg\gpg.exe";
     public string HomeDir { get; set; }
 
     public GpgWrapper(Func<IAsyncProcess> processFactory, IFileSystem fileSystem)
@@ -71,6 +71,18 @@ namespace CrowdedPrison.Core
     public Task<bool> GenerateKeyAsync(string name, string password)
     {
       return RunCommandAsync($"--batch --passphrase-fd 0 --pinentry-mode loopback --quick-generate-key {name}", password);
+    }
+     
+    public async Task<bool> KeyExistsAsync(string name)
+    {
+      try
+      {
+        return await RunCommandAsync($"--batch --list-keys {name}");
+      }
+      catch (Exception ex )
+      {
+        return false;
+      }
     }
 
     public async Task<bool> InOperationAsync(string data, Func<string, Task<bool>> operation)
@@ -134,8 +146,8 @@ namespace CrowdedPrison.Core
 
         await p.WaitForExitAsync();
 
-        if (string.IsNullOrWhiteSpace(p.ErrorText)) return p.ExitCode == 0;
-
+        if (p.ExitCode == 0) return true;
+        if (string.IsNullOrWhiteSpace(p.ErrorText)) return false;
 
         throw new GpgException(p.ErrorText);
       }

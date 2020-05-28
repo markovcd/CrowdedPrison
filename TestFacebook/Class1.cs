@@ -1,10 +1,12 @@
-﻿using fbchat_sharp.API;
+﻿using CrowdedPrison.Core;
+using fbchat_sharp.API;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TestFacebook
@@ -14,17 +16,6 @@ namespace TestFacebook
     private static readonly string appName = "FBChat-Sharp";
     private static readonly string sessionFile = "SESSION_COOKIES_core.dat";
 
-    public FBClient_Cookies()
-    {
-      On2FACodeCallback = get2FACode;
-    }
-
-    private async Task<string> get2FACode()
-    {
-      await Task.Yield();
-      Console.WriteLine("Insert 2FA code:");
-      return Console.ReadLine();
-    }
 
 
     protected override async Task OnEvent(FB_Event ev)
@@ -100,29 +91,44 @@ namespace TestFacebook
       {
         string folderBase = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         string dir = Path.Combine(folderBase, appName.ToUpper());
-        return CheckDir(dir);
+        Directory.CreateDirectory(dir);
+        return dir;
       }
     }
-
-    /// <summary>
-    /// Check the specified folder, and create if it doesn't exist.
-    /// </summary>
-    /// <param name="dir"></param>
-    /// <returns></returns>
-    private static string CheckDir(string dir)
-    {
-      Directory.CreateDirectory(dir);
-      return dir;
-    }
   }
-  class Class1
+
+
+
+
+  public static class Program
   {
-
-
-    public async void Login()
+    private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
+    public static async Task Main()
     {
-      var messenger = new FBClient_Cookies();
-      var s = await messenger.DoLogin("markovcd@gmail.com", "oyM7kIE4JVd6");
+      var messenger = new FBClient_Cookies
+      {
+        On2FACodeCallback = get2FACode
+      };
+      var s = await messenger.TryLogin();
+      if (s == null) s = await messenger.DoLogin("markovcd@gmail.com", "oyM7kIE4JVd6");
+      Console.WriteLine(await s.is_logged_in());
+
+      var users = await messenger.fetchUsers();
+      await messenger.StartListening();
+
+      Console.WriteLine("Listening... Press Ctrl+C to exit.");
+      Console.CancelKeyPress += new ConsoleCancelEventHandler((s, e) => { e.Cancel = true; _closing.Set(); });
+      _closing.WaitOne();
+      await messenger.StopListening();
+
     }
+
+    private static async Task<string> get2FACode()
+    {
+      await Task.Yield();
+      Console.WriteLine("Insert 2FA code:");
+      return Console.ReadLine();
+    }
+
   }
 }

@@ -1,13 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Gave.Libs.Fbchat" Version="0.3.4-alpha" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrowdedPrison.Core\CrowdedPrison.Core.csproj" />
   </ItemGroup>
 
 </Project>

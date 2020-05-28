@@ -9,5 +9,6 @@ namespace CrowdedPrison.Core
     Task<bool> ImportKeyAsync(string key);
     Task<string> ExportKeyAsync(string name);
     Task<bool> GenerateKeyAsync(string name, string password);
+    Task<bool> KeyExistsAsync(string name);
   }
 }
