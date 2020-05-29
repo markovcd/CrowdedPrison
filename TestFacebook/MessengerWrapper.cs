@@ -22,8 +22,25 @@ namespace TestFacebook
     {
       messenger = new FBClient_Cookies
       {
-        On2FACodeCallback = GetTwoFactorCode
+        On2FACodeCallback = GetTwoFactorCode,
+        OnMessageReceivedCallback = OnMessageReceived
       };
+    }
+
+    private void OnMessageReceived(FB_MessageEvent messageArgs)
+    {
+      if (!Users.TryGetValue(messageArgs.author.uid, out var user))
+        user = new MessengerUser(messageArgs.author);
+
+      var message = new MessengerMessage(messageArgs.message);
+
+      OnMessageReceived(user, message);
+    }
+
+    protected virtual void OnMessageReceived(MessengerUser user, MessengerMessage message)
+    {
+      var args = new MessageReceivedEventArgs(user, message);
+      MessageReceived?.Invoke(this, args);
     }
 
     private async Task<string> GetTwoFactorCode()
@@ -60,14 +77,15 @@ namespace TestFacebook
       var isLoggedIn = await session.is_logged_in();
       if (!isLoggedIn) return false;
 
-      _ = UpdateUsersAsync();
-      _ = messenger.StartListening();
+      await UpdateUsersAsync();
+      await messenger.StartListening();
 
       return true;
     }
 
-    public async Task Logout()
+    public async Task LogoutAsync()
     {
+      await messenger.StopListening();
       await messenger.DoLogout();
     }
 
