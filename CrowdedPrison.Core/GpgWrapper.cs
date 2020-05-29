@@ -85,6 +85,28 @@ namespace CrowdedPrison.Core
       }
     }
 
+    public async Task<string> ListKeysAsync()
+    {
+      return await RunCommandWithOutputAsync("--list-keys --with-fingerprint --with-colons --fixed-list-mode");
+    }
+
+    public async Task<string> RunCommandWithOutputAsync(string command)
+    {
+      var p = processFactory();
+      using (p as IDisposable)
+      {
+        if (!string.IsNullOrEmpty(HomeDir)) command = $"--homedir {HomeDir} {command}";
+        p.Start(GpgPath, command);
+
+        await p.WaitForExitAsync();
+
+        if (string.IsNullOrWhiteSpace(p.ErrorText)) return p.OutputText;
+
+        throw new GpgException(p.ErrorText);
+      }
+    }
+
+
     public async Task<bool> InOperationAsync(string data, Func<string, Task<bool>> operation)
     {
       var tempFileName = fileSystem.GetTempFilePath();
