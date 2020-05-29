@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Starksoft.Aspen.GnuPG;
@@ -15,8 +16,8 @@ namespace CrowdedPrison.Core
     private readonly Func<IAsyncProcess> processFactory;
     private readonly IFileSystem fileSystem;
 
-    public string GpgPath { get; set; } = @"C:\Users\marko\Desktop\GnuPg\gpg.exe";
-    public string HomeDir { get; set; }
+    public string GpgPath { get; set; } = @"C:\Users\armw\Desktop\gpg\gpg.exe";
+    public string HomeDir { get; set; } = @"C:\Users\armw\Desktop\gpg\homedir";
 
     public GpgWrapper(Func<IAsyncProcess> processFactory, IFileSystem fileSystem)
     {
@@ -161,7 +162,11 @@ namespace CrowdedPrison.Core
       var p = processFactory();
       using (p as IDisposable)
       {
-        if (!string.IsNullOrEmpty(HomeDir)) command = $"--homedir {HomeDir} {command}";
+        if (!string.IsNullOrEmpty(HomeDir))
+        {
+          Directory.CreateDirectory(HomeDir);
+          command = $"--homedir {HomeDir} {command}";
+        }
         p.Start(GpgPath, command);
 
         if (input != null) await p.WriteToInputAsync(input);
