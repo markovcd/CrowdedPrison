@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TestFacebook
 {
-  public class MessengerWrapper : IMessengerWrapper, IAsyncDisposable
+  public class MessengerWrapper : IMessenger
   {
     private readonly FBClient_Cookies messenger;
     private Session session;
@@ -69,15 +69,14 @@ namespace TestFacebook
       if (session == null)
       {
         var (email, password) = OnUserLoginRequested();
-        session = await messenger.DoLogin(email, password);
-        if (session == null) session = await messenger.DoLogin(email, password);
+        session = await messenger.DoLogin(email, password) 
+                  ?? await messenger.DoLogin(email, password);
       }
 
       if (session == null) return false;
       var isLoggedIn = await session.is_logged_in();
       if (!isLoggedIn) return false;
 
-      await UpdateUsersAsync();
       await messenger.StartListening();
 
       return true;
@@ -93,12 +92,11 @@ namespace TestFacebook
     {
       var users = await messenger.fetchUsers();
       Users = users.Select(u => new MessengerUser(u)).ToImmutableDictionary(u => u.Id);
-      await UpdateActiveUsersAsync();
     }
 
     public async Task UpdateActiveUsersAsync()
     {
-      if (Users == null) return;
+      if (Users == null) await UpdateUsersAsync();
 
       var activeIds = new HashSet<string>(await messenger.fetchActiveUsers());
 

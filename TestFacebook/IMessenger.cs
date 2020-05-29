@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using fbchat_sharp.API;
 
@@ -37,13 +38,17 @@ namespace TestFacebook
     }
   }
 
-  public interface IMessengerWrapper
+  public interface IMessenger : IAsyncDisposable
   {
+    IReadOnlyDictionary<string, MessengerUser> Users { get; }
+
     event EventHandler<TwoFactorEventArgs> TwoFactorRequested;
     event EventHandler<UserLoginEventArgs> UserLoginRequested;
     event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
     Task<bool> LoginAsync();
     Task LogoutAsync();
+    Task UpdateUsersAsync();
+    Task UpdateActiveUsersAsync();
   }
 }

@@ -10,30 +10,42 @@ namespace TestFacebook
     private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
     public static async Task Main()
     {
-      var messenger = new FBClient_Cookies
-      {
-        On2FACodeCallback = get2FACode
-      };
-      var s = await messenger.TryLogin();
-      if (s == null) s = await messenger.DoLogin("markovcd@gmail.com", "oyM7kIE4JVd6");
-      Console.WriteLine(await s.is_logged_in());
+      IMessenger messenger = new MessengerWrapper();
 
-      var users = await messenger.fetchUsers();
-      await messenger.StartListening();
+      messenger.MessageReceived += Messenger_MessageReceived;
+      messenger.TwoFactorRequested += Messenger_TwoFactorRequested;
+      messenger.UserLoginRequested += Messenger_UserLoginRequested;
+
+      if (!await messenger.LoginAsync())
+      {
+        Console.WriteLine("Login failed");
+        return;
+      }
+
+      await messenger.UpdateActiveUsersAsync();
 
       Console.WriteLine("Listening... Press Ctrl+C to exit.");
-      Console.CancelKeyPress += new ConsoleCancelEventHandler((s, e) => { e.Cancel = true; _closing.Set(); });
+      Console.CancelKeyPress += (s, e) => { e.Cancel = true; _closing.Set(); };
       _closing.WaitOne();
-      await messenger.StopListening();
-
+      await messenger.DisposeAsync();
     }
 
-    private static async Task<string> get2FACode()
+    private static void Messenger_UserLoginRequested(object sender, UserLoginEventArgs e)
     {
-      await Task.Yield();
-      Console.WriteLine("Insert 2FA code:");
-      return Console.ReadLine();
+      e.Email = "markovcd@gmail.com";
+      e.Password = "";
+      Console.WriteLine($"Login as {e.Email}");
     }
 
+    private static void Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
+    {
+      Console.WriteLine("Enter 2FA:");
+      e.TwoFactorCode = Console.ReadLine();
+    }
+
+    private static void Messenger_MessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+      Console.WriteLine($"{e.User.Id} {e.User.Name} {e.Message.Text}");
+    }
   }
 }
