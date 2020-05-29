@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core
 {
@@ -10,6 +11,6 @@ namespace CrowdedPrison.Core
     Task<string> ExportKeyAsync(string name);
     Task<bool> GenerateKeyAsync(string name, string password);
     Task<bool> KeyExistsAsync(string name);
-    Task<string> ListKeysAsync();
+    Task<IReadOnlyList<IReadOnlyList<string>>> ListKeysAsync();
   }
 }

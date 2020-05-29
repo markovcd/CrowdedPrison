@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,8 +17,8 @@ namespace CrowdedPrison.Core
     private readonly Func<IAsyncProcess> processFactory;
     private readonly IFileSystem fileSystem;
 
-    public string GpgPath { get; set; } = @"C:\Users\armw\Desktop\gpg\gpg.exe";
-    public string HomeDir { get; set; } = @"C:\Users\armw\Desktop\gpg\homedir";
+    public string GpgPath { get; set; } = @"C:\Users\marko\Desktop\GnuPg\gpg.exe";
+    public string HomeDir { get; set; }
 
     public GpgWrapper(Func<IAsyncProcess> processFactory, IFileSystem fileSystem)
     {
@@ -86,12 +87,19 @@ namespace CrowdedPrison.Core
       }
     }
 
-    public async Task<string> ListKeysAsync()
+    public async Task<IReadOnlyList<IReadOnlyList<string>>> ListKeysAsync()
     {
-      return await RunCommandWithOutputAsync("--list-keys --with-fingerprint --with-colons --fixed-list-mode");
+      var output = await RunCommandWithOutputAsync("--list-keys --with-fingerprint --with-colons --fixed-list-mode");
+      var result = new List<IReadOnlyList<string>>();
+      foreach (var line in output)
+      {
+        var fields = line.Split(':');
+        result.Add(fields);
+      }
+      return result;
     }
 
-    public async Task<string> RunCommandWithOutputAsync(string command)
+    public async Task<IReadOnlyList<string>> RunCommandWithOutputAsync(string command)
     {
       var p = processFactory();
       using (p as IDisposable)
@@ -101,7 +109,14 @@ namespace CrowdedPrison.Core
 
         await p.WaitForExitAsync();
 
-        if (string.IsNullOrWhiteSpace(p.ErrorText)) return p.OutputText;
+
+        if (p.ExitCode == 0)
+        {
+          var output = p.Data.Where(d => !d.IsError).Select(d => d.Data).ToList();
+          return output;
+        }
+
+        if (string.IsNullOrWhiteSpace(p.ErrorText)) return null;
 
         throw new GpgException(p.ErrorText);
       }
