@@ -79,7 +79,7 @@ namespace CrowdedPrison.Core
       {
         return await RunCommandAsync($"--batch --list-keys {name}");
       }
-      catch (Exception ex )
+      catch (GpgException)
       {
         return false;
       }
