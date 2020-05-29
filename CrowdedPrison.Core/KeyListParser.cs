@@ -183,18 +183,20 @@ namespace CrowdedPrison.Core
 
     public static KeyListField ParseField(IReadOnlyList<string> f)
     {
-      var result = new KeyListField();
+      var result = new KeyListField
+      {
+        Type = GetFieldType(GetItem(f, 0)),
+        Validity = GetValidity(GetItem(f, 1)),
+        KeyLength = GetKeyLength(GetItem(f, 2)),
+        Algorithm = GetAlgorithm(GetItem(f, 3)),
+        KeyId = GetItem(f, 4),
+        CreationDate = GetDate(GetItem(f, 5)),
+        ExpirationDate = GetDate(GetItem(f, 6)),
+        UserIdHash = GetItem(f, 7),
+        UserId = GetItem(f, 9),
+        Cababilities = GetCapabilities(GetItem(f, 11))
+      };
 
-      result.Type = GetFieldType(GetItem(f, 0));
-      result.Validity = GetValidity(GetItem(f, 1));
-      result.KeyLength = GetKeyLength(GetItem(f, 2));
-      result.Algorithm = GetAlgorithm(GetItem(f, 3));
-      result.KeyId = GetItem(f, 4);
-      result.CreationDate = GetDate(GetItem(f, 5));
-      result.ExpirationDate = GetDate(GetItem(f, 6));
-      result.UserIdHash = GetItem(f, 7);
-      result.UserId = GetItem(f, 9);
-      result.Cababilities = GetCapabilities(GetItem(f, 11));
       return result;
     }
 
@@ -207,6 +209,7 @@ namespace CrowdedPrison.Core
     private static KeyCababilities GetCapabilities(string s)
     {
       KeyCababilities result = default;
+
       if (s.Contains('e')) result |= KeyCababilities.Encrypt;
       if (s.Contains('s')) result |= KeyCababilities.Sign;
       if (s.Contains('c')) result |= KeyCababilities.Certify;
@@ -253,6 +256,7 @@ namespace CrowdedPrison.Core
     private static KeyValidity GetValidity(string s)
     {
       KeyValidity result = default;
+
       if (s.Contains('o')) result |= KeyValidity.Unknown;
       if (s.Contains('i')) result |= KeyValidity.Invalid;
       if (s.Contains('d')) result |= KeyValidity.Disabled;
@@ -272,30 +276,29 @@ namespace CrowdedPrison.Core
 
     private static FieldType GetFieldType(string s)
     {
-
-      switch (s)
+      return s switch
       {
-        case "pub": return FieldType.PublicKey;
-        case "crt": return FieldType.CertX509;
-        case "crs": return FieldType.CertX509WithPrivateKey;
-        case "sub": return FieldType.Subkey;
-        case "sec": return FieldType.SecretKey;
-        case "ssb": return FieldType.SecretSubKey;
-        case "uid": return FieldType.UserId;
-        case "uat": return FieldType.UserAttribute;
-        case "sig": return FieldType.Signature;
-        case "rev": return FieldType.RevocationSignature;
-        case "rvs": return FieldType.RevocationSignatureStandalone;
-        case "fpr": return FieldType.Fingerprint;
-        case "pkd": return FieldType.PublicKeyData;
-        case "grp": return FieldType.Keygrip;
-        case "rvk": return FieldType.RevocationKey;
-        case "tfs": return FieldType.TofuStatistics;
-        case "tru": return FieldType.TrustDatabaseInformation;
-        case "spk": return FieldType.SignatureSubpacket;
-        case "cfg": return FieldType.ConfigurationData;
-        default: return default;
-      }
+        "pub" => FieldType.PublicKey,
+        "crt" => FieldType.CertX509,
+        "crs" => FieldType.CertX509WithPrivateKey,
+        "sub" => FieldType.Subkey,
+        "sec" => FieldType.SecretKey,
+        "ssb" => FieldType.SecretSubKey,
+        "uid" => FieldType.UserId,
+        "uat" => FieldType.UserAttribute,
+        "sig" => FieldType.Signature,
+        "rev" => FieldType.RevocationSignature,
+        "rvs" => FieldType.RevocationSignatureStandalone,
+        "fpr" => FieldType.Fingerprint,
+        "pkd" => FieldType.PublicKeyData,
+        "grp" => FieldType.Keygrip,
+        "rvk" => FieldType.RevocationKey,
+        "tfs" => FieldType.TofuStatistics,
+        "tru" => FieldType.TrustDatabaseInformation,
+        "spk" => FieldType.SignatureSubpacket,
+        "cfg" => FieldType.ConfigurationData,
+        _ => default,
+      };
     }
 
   }
