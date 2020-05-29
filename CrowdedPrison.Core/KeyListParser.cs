@@ -8,24 +8,12 @@ namespace CrowdedPrison.Core
   {
     Unknown,
     PublicKey,
-    CertX509,
-    CertX509WithPrivateKey,
     Subkey,
     SecretKey,
     SecretSubKey,
     UserId,
-    UserAttribute,
-    Signature,
-    RevocationSignature,
-    RevocationSignatureStandalone,
     Fingerprint,
-    PublicKeyData,
     Keygrip,
-    RevocationKey,
-    TofuStatistics,
-    TrustDatabaseInformation,
-    SignatureSubpacket,
-    ConfigurationData
   }
 
   [Flags]
@@ -165,7 +153,7 @@ namespace CrowdedPrison.Core
       foreach (var inner in l)
       {
         var field = ParseField(inner);
-        if (field.Type == FieldType.TrustDatabaseInformation) continue;
+        if (field.Type == FieldType.Unknown) continue;
 
         if (field.Type == FieldType.PublicKey || field.Type == FieldType.SecretKey)
         {
@@ -279,24 +267,12 @@ namespace CrowdedPrison.Core
       return s switch
       {
         "pub" => FieldType.PublicKey,
-        "crt" => FieldType.CertX509,
-        "crs" => FieldType.CertX509WithPrivateKey,
         "sub" => FieldType.Subkey,
         "sec" => FieldType.SecretKey,
         "ssb" => FieldType.SecretSubKey,
         "uid" => FieldType.UserId,
-        "uat" => FieldType.UserAttribute,
-        "sig" => FieldType.Signature,
-        "rev" => FieldType.RevocationSignature,
-        "rvs" => FieldType.RevocationSignatureStandalone,
         "fpr" => FieldType.Fingerprint,
-        "pkd" => FieldType.PublicKeyData,
         "grp" => FieldType.Keygrip,
-        "rvk" => FieldType.RevocationKey,
-        "tfs" => FieldType.TofuStatistics,
-        "tru" => FieldType.TrustDatabaseInformation,
-        "spk" => FieldType.SignatureSubpacket,
-        "cfg" => FieldType.ConfigurationData,
         _ => default,
       };
     }
