@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using fbchat_sharp.API;
 
 namespace TestFacebook
 {
@@ -14,16 +13,6 @@ namespace TestFacebook
   {
     public string Email { get; set; }
     public string Password { get; set; }
-  }
-
-  public class MessengerMessage
-  {
-    public string Text { get; }
-
-    internal MessengerMessage(FB_Message message)
-    {
-      Text = message.text;
-    }
   }
 
   public class MessageReceivedEventArgs : EventArgs
@@ -41,6 +30,7 @@ namespace TestFacebook
   public interface IMessenger : IAsyncDisposable
   {
     IReadOnlyDictionary<string, MessengerUser> Users { get; }
+    MessengerUser Self { get; }
 
     event EventHandler<TwoFactorEventArgs> TwoFactorRequested;
     event EventHandler<UserLoginEventArgs> UserLoginRequested;
@@ -50,5 +40,8 @@ namespace TestFacebook
     Task LogoutAsync();
     Task UpdateUsersAsync();
     Task UpdateActiveUsersAsync();
+    Task<bool> SendTextAsync(string userId, string message);
+    Task<bool> SendTextAsync(MessengerUser user, string message);
+    Task<bool> CheckConnectionStateAsync();
   }
 }

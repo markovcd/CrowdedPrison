@@ -17,6 +17,7 @@ namespace TestFacebook
     public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
     public IReadOnlyDictionary<string, MessengerUser> Users { get; private set; }
+    public MessengerUser Self { get; private set; }
 
     public MessengerWrapper()
     {
@@ -27,41 +28,12 @@ namespace TestFacebook
       };
     }
 
-    private void OnMessageReceived(FB_MessageEvent messageArgs)
+    public async Task<bool> CheckConnectionStateAsync()
     {
-      if (!Users.TryGetValue(messageArgs.author.uid, out var user))
-        user = new MessengerUser(messageArgs.author);
-
-      var message = new MessengerMessage(messageArgs.message);
-
-      OnMessageReceived(user, message);
+      if (session == null) return false;
+      return await session.is_logged_in();
     }
 
-    protected virtual void OnMessageReceived(MessengerUser user, MessengerMessage message)
-    {
-      var args = new MessageReceivedEventArgs(user, message);
-      MessageReceived?.Invoke(this, args);
-    }
-
-    private async Task<string> GetTwoFactorCode()
-    {
-      await Task.Yield();
-      return OnTwoFactorRequested();
-    }
-
-    protected string OnTwoFactorRequested()
-    {
-      var args = new TwoFactorEventArgs();
-      TwoFactorRequested?.Invoke(this, args);
-      return args.TwoFactorCode;
-    }
-
-    protected (string email, string password) OnUserLoginRequested()
-    {
-      var args = new UserLoginEventArgs();
-      UserLoginRequested?.Invoke(this, args);
-      return (args.Email, args.Password);
-    }
 
     public async Task<bool> LoginAsync()
     {
@@ -73,13 +45,27 @@ namespace TestFacebook
                   ?? await messenger.DoLogin(email, password);
       }
 
-      if (session == null) return false;
-      var isLoggedIn = await session.is_logged_in();
-      if (!isLoggedIn) return false;
+      if (!await CheckConnectionStateAsync())
+        return false;
 
       await messenger.StartListening();
+      
+      Self = new MessengerUser(await messenger.fetchProfile());
+      await UpdateActiveUsersAsync();
 
       return true;
+    }
+
+    public async Task<bool> SendTextAsync(string userId, string message)
+    {
+      var thread = new FB_Thread(userId, session);
+      var msgId = await thread.sendText(message);
+      return !string.IsNullOrEmpty(msgId);
+    }
+
+    public async Task<bool> SendTextAsync(MessengerUser user, string message)
+    {
+      return await SendTextAsync(user.Id, message);
     }
 
     public async Task LogoutAsync()
@@ -110,5 +96,46 @@ namespace TestFacebook
     {
       await messenger.StopListening();
     }
+
+    protected virtual void OnMessageReceived(MessengerUser user, MessengerMessage message)
+    {
+      var args = new MessageReceivedEventArgs(user, message);
+      MessageReceived?.Invoke(this, args);
+    }
+
+    protected string OnTwoFactorRequested()
+    {
+      var args = new TwoFactorEventArgs();
+      TwoFactorRequested?.Invoke(this, args);
+      return args.TwoFactorCode;
+    }
+
+    protected (string email, string password) OnUserLoginRequested()
+    {
+      var args = new UserLoginEventArgs();
+      UserLoginRequested?.Invoke(this, args);
+      return (args.Email, args.Password);
+    }
+
+    private void OnMessageReceived(FB_MessageEvent messageArgs)
+    {
+      if (!Users.TryGetValue(messageArgs.author.uid, out var user))
+      {
+        user = messageArgs.author.uid == Self?.Id 
+          ? Self 
+          : new MessengerUser(messageArgs.author);
+      }
+
+      var message = new MessengerMessage(messageArgs.message);
+
+      OnMessageReceived(user, message);
+    }
+
+    private async Task<string> GetTwoFactorCode()
+    {
+      await Task.Yield();
+      return OnTwoFactorRequested();
+    }
+
   }
 }

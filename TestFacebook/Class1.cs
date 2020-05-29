@@ -22,8 +22,7 @@ namespace TestFacebook
         return;
       }
 
-      await messenger.UpdateActiveUsersAsync();
-
+      await messenger.SendTextAsync(messenger.Self, "eLOOOOOOOOOOOOO");
       Console.WriteLine("Listening... Press Ctrl+C to exit.");
       Console.CancelKeyPress += (s, e) => { e.Cancel = true; _closing.Set(); };
       _closing.WaitOne();
