@@ -85,33 +85,123 @@ namespace CrowdedPrison.Core
     public KeyCababilities Cababilities { get; set; }
   }
 
+  public class GpgKey
+  {
+    public bool IsSecret { get; set; }
+    public string Fingerprint { get; set; }
+    public string Keygrip { get; set; }
+    public DateTime CreationDate { get; set; }
+    public DateTime ExpirationDate { get; set; }
+    public string UserIdHash { get; set; }
+    public string UserId { get; set; }
+    public KeyCababilities Cababilities { get; set; }
+    public PublicKeyAlgorithm Algorithm { get; set; }
+    public KeyValidity Validity { get; set; }
+    public int KeyLength { get; set; }
+    public string KeyId { get; set; }
+  }
+
   public class KeyListParser
   {
-    private static void AddToFlag(ref KeyValidity addTo, KeyValidity add)
+    public static IReadOnlyList<GpgKey> GpgKeysFromFields(IEnumerable<IEnumerable<KeyListField>> fields)
     {
-      addTo |= add;
+      return fields.Select(GpgKeyFromFields).ToList();
     }
 
-    public static IReadOnlyList<KeyListField> ParseFields(IReadOnlyList<IReadOnlyList<string>> l)
+    public static GpgKey GpgKeyFromFields(IEnumerable<KeyListField> fields)
     {
-      return l.Select(ParseField).ToList();
+      var key = new GpgKey();
+      var addFingerprint = false;
+      var addKeygrip = false;
+
+      foreach (var field in fields)
+      {
+        if (field.Type == FieldType.SecretKey)
+        { 
+          key.IsSecret = true;
+          addKeygrip = true;
+        }
+        
+        if (field.Type == FieldType.SecretKey || field.Type == FieldType.PublicKey)
+        {
+          key.Algorithm = field.Algorithm;
+          key.Cababilities = field.Cababilities;
+          key.CreationDate = field.CreationDate;
+          key.ExpirationDate = field.ExpirationDate;
+          key.KeyId = field.KeyId;
+          key.KeyLength = field.KeyLength;
+          key.Validity = field.Validity;
+
+          addFingerprint = true;
+        }
+
+        if (field.Type == FieldType.Fingerprint && addFingerprint)
+        {
+          key.Fingerprint = field.UserId;
+          addFingerprint = false;
+        }
+
+        if (field.Type == FieldType.Keygrip && addKeygrip)
+        {
+          key.Keygrip = field.UserId;
+          addKeygrip = false;
+        }
+
+        if (field.Type == FieldType.UserId)
+        {
+          key.UserId = field.UserId;
+          key.UserIdHash = field.UserIdHash;
+        }
+      }
+
+      return key;
+    }
+
+    public static IReadOnlyList<IReadOnlyList<KeyListField>> ParseFields(IReadOnlyList<IReadOnlyList<string>> l)
+    {
+      List<KeyListField> current = null;
+      var total = new List<IReadOnlyList<KeyListField>>();
+
+      foreach (var inner in l)
+      {
+        var field = ParseField(inner);
+        if (field.Type == FieldType.TrustDatabaseInformation) continue;
+
+        if (field.Type == FieldType.PublicKey || field.Type == FieldType.SecretKey)
+        {
+          if (current != null) total.Add(current);
+          current = new List<KeyListField>();
+        }
+
+        current.Add(field);
+      }
+
+      if (current != null) total.Add(current);
+
+      return total; 
     }
 
     public static KeyListField ParseField(IReadOnlyList<string> f)
     {
       var result = new KeyListField();
 
-      result.Type = GetFieldType(f[0]);
-      result.Validity = GetValidity(f[1]);
-      result.KeyLength = GetKeyLength(f[2]);
-      result.Algorithm = GetAlgorithm(f[3]);
-      result.KeyId = f[4];
-      result.CreationDate = GetDate(f[5]);
-      result.ExpirationDate = GetDate(f[6]);
-      result.UserIdHash = f[7];
-      result.UserId = f[9];
-      result.Cababilities = GetCapabilities(f[11]);
+      result.Type = GetFieldType(GetItem(f, 0));
+      result.Validity = GetValidity(GetItem(f, 1));
+      result.KeyLength = GetKeyLength(GetItem(f, 2));
+      result.Algorithm = GetAlgorithm(GetItem(f, 3));
+      result.KeyId = GetItem(f, 4);
+      result.CreationDate = GetDate(GetItem(f, 5));
+      result.ExpirationDate = GetDate(GetItem(f, 6));
+      result.UserIdHash = GetItem(f, 7);
+      result.UserId = GetItem(f, 9);
+      result.Cababilities = GetCapabilities(GetItem(f, 11));
       return result;
+    }
+
+    private static string GetItem(IReadOnlyList<string> f, int index)
+    {
+      if (index >= f.Count) return string.Empty;
+      return f[index];
     }
 
     private static KeyCababilities GetCapabilities(string s)

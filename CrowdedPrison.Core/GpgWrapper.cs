@@ -87,9 +87,10 @@ namespace CrowdedPrison.Core
       }
     }
 
-    public async Task<IReadOnlyList<IReadOnlyList<string>>> ListKeysAsync()
+    public async Task<IReadOnlyList<IReadOnlyList<string>>> ListKeysAsync(bool secret = false)
     {
-      var output = await RunCommandWithOutputAsync("--list-keys --with-fingerprint --with-colons --fixed-list-mode");
+      var cmd = secret ? "--list-secret-keys" : "--list-keys";
+      var output = await RunCommandWithOutputAsync($"{cmd} --with-fingerprint --with-colons --fixed-list-mode");
       var result = new List<IReadOnlyList<string>>();
       foreach (var line in output)
       {
