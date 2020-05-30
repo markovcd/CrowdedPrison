@@ -12,10 +12,6 @@ namespace CrowdedPrison.Core
     private Process process;
     private readonly List<OutputData> dataList = new List<OutputData>();
     public ProcessState State { get; private set; }
-
-    private readonly AsyncStream<OutputData> asyncStream = new AsyncStream<OutputData>();
-
-    public IAsyncEnumerable<OutputData> AsyncDataStream => asyncStream;
     public IReadOnlyList<OutputData> Data => dataList;
 
     public int ExitCode => process.ExitCode;
@@ -74,7 +70,6 @@ namespace CrowdedPrison.Core
     {
       if (string.IsNullOrEmpty(data)) return;
       var o = new OutputData(data, isError);
-      asyncStream.Add(o);
       dataList.Add(o);
     }
 
@@ -118,7 +113,6 @@ namespace CrowdedPrison.Core
 
     private void Process_Exited(object sender, EventArgs e)
     {
-      asyncStream.Finish();
       tcs?.TrySetResult(default);
       State = ProcessState.Exited;
     }

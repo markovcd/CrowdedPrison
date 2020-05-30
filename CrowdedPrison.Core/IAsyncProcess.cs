@@ -12,7 +12,6 @@ namespace CrowdedPrison.Core
 
   public interface IAsyncProcess
   {
-    IAsyncEnumerable<OutputData> AsyncDataStream { get; }
     IReadOnlyList<OutputData> Data { get; }
     ProcessState State { get; }
     int ExitCode { get; }

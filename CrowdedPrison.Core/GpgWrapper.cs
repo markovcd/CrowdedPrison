@@ -75,11 +75,12 @@ namespace CrowdedPrison.Core
       return RunCommandAsync($"--batch --passphrase '{password}' --quick-generate-key {name}");
     }
      
-    public async Task<bool> KeyExistsAsync(string name)
+    public async Task<bool> KeyExistsAsync(string name, bool secret = false)
     {
       try
       {
-        return await RunCommandAsync($"--batch --list-keys {name}");
+        var cmd = GetListKeysCmd(secret);
+        return await RunCommandAsync($"--batch {cmd} {name}");
       }
       catch (GpgException)
       {
@@ -89,7 +90,7 @@ namespace CrowdedPrison.Core
 
     public async Task<IReadOnlyList<IReadOnlyList<string>>> ListKeysAsync(bool secret = false)
     {
-      var cmd = secret ? "--list-secret-keys" : "--list-keys";
+      var cmd = GetListKeysCmd(secret);
       var output = await RunCommandWithOutputAsync($"{cmd} --with-fingerprint --with-colons --fixed-list-mode");
       var result = new List<IReadOnlyList<string>>();
       foreach (var line in output)
@@ -100,7 +101,7 @@ namespace CrowdedPrison.Core
       return result;
     }
 
-    public async Task<IReadOnlyList<string>> RunCommandWithOutputAsync(string command)
+    private async Task<IReadOnlyList<string>> RunCommandWithOutputAsync(string command)
     {
       var p = processFactory();
       using (p as IDisposable)
@@ -124,7 +125,7 @@ namespace CrowdedPrison.Core
     }
 
 
-    public async Task<bool> InOperationAsync(string data, Func<string, Task<bool>> operation)
+    private async Task<bool> InOperationAsync(string data, Func<string, Task<bool>> operation)
     {
       var tempFileName = fileSystem.GetTempFilePath();
       try
@@ -138,7 +139,7 @@ namespace CrowdedPrison.Core
       }
     }
 
-    public async Task<string> OutOperationAsync(Func<string, Task<bool>> operation)
+    private async Task<string> OutOperationAsync(Func<string, Task<bool>> operation)
     {
       var tempFileName = fileSystem.GetTempFilePath();
 
@@ -173,7 +174,7 @@ namespace CrowdedPrison.Core
       }
     }
 
-    public async Task<bool> RunCommandAsync(string command)
+    private async Task<bool> RunCommandAsync(string command)
     {
       var p = processFactory();
       using (p as IDisposable)
@@ -193,5 +194,11 @@ namespace CrowdedPrison.Core
         throw new GpgException(p.ErrorText);
       }
     }
+
+    private static string GetListKeysCmd(bool secret)
+    {
+      return secret ? "--list-secret-keys" : "--list-keys";
+    }
+
   }
 }
