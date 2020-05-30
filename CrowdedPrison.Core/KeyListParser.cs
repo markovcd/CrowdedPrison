@@ -85,8 +85,8 @@ namespace CrowdedPrison.Core
     public KeyCababilities Cababilities { get; set; }
     public PublicKeyAlgorithm Algorithm { get; set; }
     public KeyValidity Validity { get; set; }
-    public int KeyLength { get; set; }
-    public string KeyId { get; set; }
+    public int Length { get; set; }
+    public string Id { get; set; }
   }
 
   public class KeyListParser
@@ -116,8 +116,8 @@ namespace CrowdedPrison.Core
           key.Cababilities = field.Cababilities;
           key.CreationDate = field.CreationDate;
           key.ExpirationDate = field.ExpirationDate;
-          key.KeyId = field.KeyId;
-          key.KeyLength = field.KeyLength;
+          key.Id = field.KeyId;
+          key.Length = field.KeyLength;
           key.Validity = field.Validity;
 
           addFingerprint = true;

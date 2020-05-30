@@ -57,7 +57,7 @@ namespace CrowdedPrison.Core
 
     public Task<bool> DecryptFileAsync(string inputFileName, string outputFileName, string password)
     {
-      return RunCommandAsync($"--armor --batch --passphrase-fd 0 --pinentry-mode loopback --output {outputFileName} --decrypt {inputFileName}", password);
+      return RunCommandAsync($"--armor --batch --passphrase '{password}' --pinentry-mode loopback --output {outputFileName} --decrypt {inputFileName}");
     }
 
     public Task<bool> ImportKeyFromFileAsync(string fileName)
@@ -72,7 +72,7 @@ namespace CrowdedPrison.Core
 
     public Task<bool> GenerateKeyAsync(string name, string password)
     {
-      return RunCommandAsync($"--batch --passphrase-fd 0 --pinentry-mode loopback --quick-generate-key {name}", password);
+      return RunCommandAsync($"--batch --passphrase '{password}' --quick-generate-key {name}");
     }
      
     public async Task<bool> KeyExistsAsync(string name)
@@ -173,7 +173,7 @@ namespace CrowdedPrison.Core
       }
     }
 
-    public async Task<bool> RunCommandAsync(string command, string input = null)
+    public async Task<bool> RunCommandAsync(string command)
     {
       var p = processFactory();
       using (p as IDisposable)
@@ -184,8 +184,6 @@ namespace CrowdedPrison.Core
           command = $"--homedir {HomeDir} {command}";
         }
         p.Start(GpgPath, command);
-
-        if (input != null) await p.WriteToInputAsync(input);
 
         await p.WaitForExitAsync();
 
