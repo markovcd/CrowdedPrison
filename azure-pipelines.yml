@@ -24,7 +24,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/CrowdedPrison.Wpf.csproj'
-    arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration)'
+    arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) -p:PublishSingleFile=true --self-contained true -r win-x64'
 
 - publish: $(Build.ArtifactStagingDirectory)
   artifact: CrowdedPrison
