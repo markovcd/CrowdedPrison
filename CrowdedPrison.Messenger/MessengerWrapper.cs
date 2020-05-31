@@ -105,6 +105,21 @@ namespace CrowdedPrison.Messenger
       Users = users.Select(u => new MessengerUser(u)).ToImmutableDictionary(u => u.Id);
     }
 
+    public async Task<IReadOnlyList<MessengerThread>> GetThreadsAsync()
+    {
+      var threads = await messenger.fetchThreadList();
+      var threads2 = threads.Select(t => new MessengerThread(t)).ToImmutableList();
+      return threads2;
+    }
+
+    public async Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerThread thread)
+    {
+      var thread2 = new FB_Thread(thread.Id, session);
+      var messages = await thread2.fetchMessages();
+      var messages2 = messages.Select(m => new MessengerMessage(m)).ToImmutableList();
+      return messages2;
+    }
+
     public async Task UpdateActiveUsersAsync()
     {
       if (Users == null) await UpdateUsersAsync();

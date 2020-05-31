@@ -26,5 +26,7 @@ namespace CrowdedPrison.Messenger
     Task<bool> SendTextAsync(string userId, string message);
     Task<bool> SendTextAsync(MessengerUser user, string message);
     Task<bool> CheckConnectionStateAsync();
+    Task<IReadOnlyList<MessengerThread>> GetThreadsAsync();
+    Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerThread thread);
   }
 }
