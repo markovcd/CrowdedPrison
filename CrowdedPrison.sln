@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Messenger", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowdedPrison.Common", "CrowdedPrison.Common\CrowdedPrison.Common.csproj", "{B37543BB-15ED-4312-889D-0970C0207032}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowdedPrison.Console", "CrowdedPrison.Console\CrowdedPrison.Console.csproj", "{4F02F555-61BE-4E95-9357-3BA3996985D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{B37543BB-15ED-4312-889D-0970C0207032}.Release|x64.Build.0 = Release|Any CPU
 		{B37543BB-15ED-4312-889D-0970C0207032}.Release|x86.ActiveCfg = Release|Any CPU
 		{B37543BB-15ED-4312-889D-0970C0207032}.Release|x86.Build.0 = Release|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Debug|x64.Build.0 = Debug|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Debug|x86.Build.0 = Debug|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Release|x64.ActiveCfg = Release|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Release|x64.Build.0 = Release|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Release|x86.ActiveCfg = Release|Any CPU
+		{4F02F555-61BE-4E95-9357-3BA3996985D7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
