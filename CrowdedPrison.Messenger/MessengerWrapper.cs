@@ -9,7 +9,7 @@ using CrowdedPrison.Messenger.Events;
 
 namespace CrowdedPrison.Messenger
 {
-  public class MessengerWrapper : IMessenger
+  internal class MessengerWrapper : IMessenger
   {
     private readonly FBClient_Cookies messenger;
     private Session session;
