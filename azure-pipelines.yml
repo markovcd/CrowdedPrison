@@ -4,12 +4,32 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+variables: 
+  buildConfiguration: 'Release'
+
 steps:
 - task: DotNetCoreCLI@2
+  displayName: 'Build'
   inputs:
     command: 'build'
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Test'
   inputs:
     command: 'test'
-    projects: './CrowdedPrison.Tests/*.csproj'
+    projects: '**/CrowdedPrison.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/CrowdedPrison.Wpf.csproj'
+    arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration) -p:PublishSingleFile=true --self-contained true -r win-x64'
+
+- publish: $(Build.ArtifactStagingDirectory)
+  displayName: 'Upload'
+  artifact: CrowdedPrison
+  
