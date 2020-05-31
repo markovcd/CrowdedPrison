@@ -26,7 +26,6 @@ namespace CrowdedPrison.Messenger
     public event EventHandler<ConnectionStateEventArgs> ConnectionStateChanged;
     public event EventHandler<MessagesDeliveredEventArgs> MessagesDelivered;
     public event EventHandler<MessageUnsentEventArgs> MessageUnsent;
-
     public event EventHandler<TypingEventArgs> Typing;
 
     public IReadOnlyDictionary<string, MessengerUser> Users { get; private set; }
@@ -151,6 +150,7 @@ namespace CrowdedPrison.Messenger
     {
       var args = new TwoFactorEventArgs();
       TwoFactorRequested?.Invoke(this, args);
+      if (args.IsCancelled) throw new OperationCanceledException();
       return args.TwoFactorCode;
     }
 
@@ -158,6 +158,7 @@ namespace CrowdedPrison.Messenger
     {
       var args = new UserLoginEventArgs();
       UserLoginRequested?.Invoke(this, args);
+      if (args.IsCancelled) throw new OperationCanceledException();
       return (args.Email, args.Password);
     }
 
