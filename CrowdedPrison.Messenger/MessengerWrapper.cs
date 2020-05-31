@@ -6,12 +6,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using CrowdedPrison.Messenger.Entities;
 using CrowdedPrison.Messenger.Events;
+using System.Net;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace CrowdedPrison.Messenger
 {
   internal class MessengerWrapper : IMessenger
   {
-    private readonly FBClient_Cookies messenger;
+    private static readonly string appName = "FBChat-Sharp";
+    private static readonly string sessionFile = "SESSION_COOKIES_core.dat";
+
+    private readonly BaseClient messenger;
     private Session session;
 
     public event EventHandler<TwoFactorEventArgs> TwoFactorRequested;
@@ -28,11 +34,72 @@ namespace CrowdedPrison.Messenger
 
     public MessengerWrapper()
     {
-      messenger = new FBClient_Cookies
+      messenger = new BaseClient
       {
         On2FACodeCallback = GetTwoFactorCode,
         FbEventCallback = OnFbEventCallback,
+        DeleteCookiesCallback = OnDeleteCookiesCallback,
+        ReadCookiesFromDiskCallback = OnReadCookiesFromDiskCallback,
+        WriteCookiesToDiskCallback = OnWriteCookiesToDiskCallback
       };
+    }
+
+    private async Task OnWriteCookiesToDiskCallback(Dictionary<string, List<Cookie>> cookieJar)
+    {
+      var file = Path.Combine(UserDataFolder, sessionFile);
+
+      using var fileStream = File.Create(file);
+      try
+      {
+        using var jsonWriter = new JsonTextWriter(new StreamWriter(fileStream));
+        JsonSerializer serializer = new JsonSerializer();
+        serializer.Serialize(jsonWriter, cookieJar);
+        await jsonWriter.FlushAsync();
+      }
+      catch 
+      {
+
+      }
+    }
+
+    private static string UserDataFolder
+    {
+      get
+      {
+        string folderBase = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string dir = Path.Combine(folderBase, appName.ToUpper());
+        Directory.CreateDirectory(dir);
+        return dir;
+      }
+    }
+    private async Task<Dictionary<string, List<Cookie>>> OnReadCookiesFromDiskCallback()
+    {
+      try
+      {
+        var file = Path.Combine(UserDataFolder, sessionFile);
+        using var fileStream = File.OpenRead(file);
+        await Task.Yield();
+        using var jsonTextReader = new JsonTextReader(new StreamReader(fileStream));
+        var serializer = new JsonSerializer();
+        return serializer.Deserialize<Dictionary<string, List<Cookie>>>(jsonTextReader);
+      }
+      catch
+      {
+        return null;
+      }
+    }
+
+    private async Task OnDeleteCookiesCallback()
+    {
+      try
+      {
+        await Task.Yield();
+        var file = Path.Combine(UserDataFolder, sessionFile);
+        File.Delete(file);
+      }
+      catch 
+      {
+      }
     }
 
     public async Task<bool> CheckConnectionStateAsync()
