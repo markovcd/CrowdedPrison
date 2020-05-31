@@ -9,8 +9,4 @@
     <PackageReference Include="Gave.Libs.Fbchat" Version="0.3.4-alpha" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CrowdedPrison.Core\CrowdedPrison.Encryption.csproj" />
-  </ItemGroup>
-
 </Project>
