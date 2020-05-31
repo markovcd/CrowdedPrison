@@ -1,6 +1,6 @@
 ﻿using fbchat_sharp.API;
 
-namespace TestFacebook
+namespace TestFacebook.Entities
 {
   public class MessengerUser
   {
@@ -15,6 +15,7 @@ namespace TestFacebook
     public string OwnNickname { get; }
     public string Gender { get; }
     public bool IsActive { get; set; }
+    public string LastActive { get; set; }
 
     internal MessengerUser(FB_User user)
     {

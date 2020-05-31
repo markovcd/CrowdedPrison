@@ -1,6 +1,6 @@
 ﻿using fbchat_sharp.API;
 
-namespace TestFacebook
+namespace TestFacebook.Entities
 {
   public class MessengerMessage
   {

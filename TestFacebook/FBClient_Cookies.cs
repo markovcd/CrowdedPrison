@@ -13,19 +13,12 @@ namespace TestFacebook
     private static readonly string appName = "FBChat-Sharp";
     private static readonly string sessionFile = "SESSION_COOKIES_core.dat";
 
-    public Action<FB_MessageEvent> OnMessageReceivedCallback { get; set; }
+    public Action<FB_Event> FbEventCallback { get; set; }
 
     protected override async Task OnEvent(FB_Event ev)
     {
-      switch (ev)
-      {
-        case FB_MessageEvent messageArgs:
-          OnMessageReceivedCallback?.Invoke(messageArgs);
-          break;
-        default:
-          Console.WriteLine($"Something happened: {ev}");
-          break;
-      }
+      FbEventCallback?.Invoke(ev);
+    
       await Task.Yield();
     }
 

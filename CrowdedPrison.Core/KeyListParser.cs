@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace CrowdedPrison.Core
@@ -93,7 +94,7 @@ namespace CrowdedPrison.Core
   {
     public static IReadOnlyList<GpgKey> GpgKeysFromFields(IEnumerable<IEnumerable<KeyListField>> fields)
     {
-      return fields.Select(GpgKeyFromFields).ToList();
+      return fields.Select(GpgKeyFromFields).ToImmutableList();
     }
 
     public static GpgKey GpgKeyFromFields(IEnumerable<KeyListField> fields)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Starksoft.Aspen.GnuPG;
+using System.Collections.Immutable;
 
 namespace CrowdedPrison.Core
 {
@@ -114,7 +114,7 @@ namespace CrowdedPrison.Core
 
         if (p.ExitCode == 0)
         {
-          var output = p.Data.Where(d => !d.IsError).Select(d => d.Data).ToList();
+          var output = p.Data.Where(d => !d.IsError).Select(d => d.Data).ToImmutableList();
           return output;
         }
 
