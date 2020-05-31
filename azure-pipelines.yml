@@ -12,4 +12,15 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: './CrowdedPrison.Tests/*.csproj'
+    projects: '**/CrowdedPrison.Tests.csproj'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/CrowdedPrison.Wpf.csproj'
+    arguments: '--output $(Build.ArtifactStagingDirectory)'
+
+- publish: $(Build.ArtifactStagingDirectory)
+  artifact: CrowdedPrison
+  
