@@ -10,5 +10,5 @@
   p:ViewModelLocator.AutoWireViewModel="True"
   x:ClassModifier="internal"
   mc:Ignorable="d">
-  <Button Content="HELLO" />
+  <Button Content="HELLO" Command="{Binding LoginCommand}"/>
 </UserControl>

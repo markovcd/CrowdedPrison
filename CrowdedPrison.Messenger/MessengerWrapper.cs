@@ -51,7 +51,7 @@ namespace CrowdedPrison.Messenger
         DeleteCookiesCallback = OnDeleteCookiesCallback,
         ReadCookiesFromDiskCallback = OnReadCookiesFromDiskCallback,
         WriteCookiesToDiskCallback = OnWriteCookiesToDiskCallback
-      };
+     };     
     }
 
     public async Task<bool> CheckConnectionStateAsync()

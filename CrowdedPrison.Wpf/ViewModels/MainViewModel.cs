@@ -1,19 +1,35 @@
 ﻿using CrowdedPrison.Messenger;
 using CrowdedPrison.Messenger.Events;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
   internal class MainViewModel : BindableBase
   {
-    private readonly IMessenger messenger;
+    private IMessenger messenger;
+    private readonly Func<IMessenger> messengerFactory;
 
-    public MainViewModel(IMessenger messenger)
+    public ICommand LoginCommand { get; }
+    public ICommand LogoutCommand { get; }
+
+    public MainViewModel(Func<IMessenger> messengerFactory)
     {
-      this.messenger = messenger;
+      this.messengerFactory = messengerFactory;
+
+      LoginCommand = new DelegateCommand(() => ConnectAsync());
+      LogoutCommand = new DelegateCommand(() => DisconnectAsync());
+
+    }
+
+    private void CreateMessenger()
+    {
+      messenger = messengerFactory();
 
       messenger.ConnectionStateChanged += Messenger_ConnectionStateChanged;
       messenger.MessageReceived += Messenger_MessageReceived;
@@ -22,6 +38,23 @@ namespace CrowdedPrison.Wpf.ViewModels
       messenger.UserLoginRequested += Messenger_UserLoginRequested;
       messenger.MessageUnsent += Messenger_MessageUnsent;
       messenger.Typing += Messenger_Typing;
+    }
+
+    private async Task DisposeMessengerAsync()
+    {
+      await messenger.DisposeAsync();
+      messenger = null;
+    }
+
+    private async Task ConnectAsync()
+    {
+      await messenger.LoginAsync();
+    }
+
+    private async Task DisconnectAsync(bool logout = false)
+    {
+      if (logout) await messenger.LogoutAsync();
+      await DisposeMessengerAsync();
     }
 
     private void Messenger_Typing(object sender, TypingEventArgs e)
