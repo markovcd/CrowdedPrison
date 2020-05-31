@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using TestFacebook.Entities;
-using TestFacebook.Events;
+using CrowdedPrison.Messenger.Entities;
+using CrowdedPrison.Messenger.Events;
 
-namespace TestFacebook
+namespace CrowdedPrison.Messenger
 {
   public class MessengerWrapper : IMessenger
   {

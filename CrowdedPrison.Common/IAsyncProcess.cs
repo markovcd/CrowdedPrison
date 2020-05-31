@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Common
 {
   public enum ProcessState
   {

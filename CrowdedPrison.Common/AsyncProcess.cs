@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Common
 {
   public class AsyncProcess : IAsyncProcess, IDisposable
   {

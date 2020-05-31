@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using fbchat_sharp.API;
 using Newtonsoft.Json;
 
-namespace TestFacebook
+namespace CrowdedPrison.Messenger
 {
   public class FBClient_Cookies : MessengerClient
   {

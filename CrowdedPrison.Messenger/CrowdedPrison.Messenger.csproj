@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CrowdedPrison.Core\CrowdedPrison.Core.csproj" />
+    <ProjectReference Include="..\CrowdedPrison.Core\CrowdedPrison.Encryption.csproj" />
   </ItemGroup>
 
 </Project>

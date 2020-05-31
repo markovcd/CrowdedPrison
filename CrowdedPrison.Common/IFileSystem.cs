@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Common
 {
   public interface IFileSystem
   {

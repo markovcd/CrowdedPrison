@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using TestFacebook.Entities;
+using CrowdedPrison.Messenger.Entities;
 
-namespace TestFacebook.Events
+namespace CrowdedPrison.Messenger.Events
 {
   public class MessagesDeliveredEventArgs : EventArgs
   {

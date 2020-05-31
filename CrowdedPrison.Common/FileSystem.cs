@@ -1,9 +1,8 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Common
 {
-
   public class FileSystem : IFileSystem
   {
     public string GetTempFilePath()

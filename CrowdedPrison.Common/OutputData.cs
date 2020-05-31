@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Common
 {
   public class OutputData
   {

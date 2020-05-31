@@ -1,6 +1,6 @@
 ﻿using fbchat_sharp.API;
 
-namespace TestFacebook.Entities
+namespace CrowdedPrison.Messenger.Entities
 {
   public class MessengerThread
   {
