@@ -57,7 +57,7 @@ namespace CrowdedPrison.Messenger
       await messenger.StartListening();
       
       Self = new MessengerUser(await messenger.fetchProfile());
-      await UpdateActiveUsersAsync();
+      await UpdateUsersAsync();
 
       return true;
     }
