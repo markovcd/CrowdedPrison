@@ -4,6 +4,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -15,15 +16,15 @@ namespace CrowdedPrison.Wpf.ViewModels
     private IMessenger messenger;
     private readonly Func<IMessenger> messengerFactory;
 
-    public ICommand LoginCommand { get; }
-    public ICommand LogoutCommand { get; }
+    public ICommand ConnectCommand { get; }
+    public ICommand DisconnectCommand { get; }
 
     public MainViewModel(Func<IMessenger> messengerFactory)
     {
       this.messengerFactory = messengerFactory;
 
-      LoginCommand = new DelegateCommand(() => ConnectAsync());
-      LogoutCommand = new DelegateCommand(() => DisconnectAsync());
+      ConnectCommand = new DelegateCommand(() => ConnectAsync());
+      DisconnectCommand = new DelegateCommand(() => DisconnectAsync());
 
     }
 
@@ -48,6 +49,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private async Task ConnectAsync()
     {
+      CreateMessenger();
       await messenger.LoginAsync();
     }
 
