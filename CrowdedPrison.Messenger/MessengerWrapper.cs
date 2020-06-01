@@ -12,7 +12,7 @@ using System.IO;
 
 namespace CrowdedPrison.Messenger
 {
-  internal class MessengerWrapper : IMessenger
+  public class MessengerWrapper : IMessenger
   {
     private const string appName = "FBChat-Sharp";
     private const string sessionFile = "SESSION_COOKIES_core.dat";
@@ -81,16 +81,40 @@ namespace CrowdedPrison.Messenger
       return true;
     }
 
-    public async Task<bool> SendTextAsync(string userId, string message)
+    public async Task<bool> SendTextAsync(string threadId, string message)
     {
-      var thread = new FB_Thread(userId, session);
+      var thread = new FB_Thread(threadId, session);
       var msgId = await thread.sendText(message);
       return !string.IsNullOrEmpty(msgId);
+    }
+
+
+    public async Task<bool> SendTextAsync(MessengerThread thread, string message)
+    {
+      return await SendTextAsync(thread.Id, message);
     }
 
     public async Task<bool> SendTextAsync(MessengerUser user, string message)
     {
       return await SendTextAsync(user.Id, message);
+    }
+
+    public async Task<IReadOnlyList<MessengerMessage>> SearchThread(string threadId, string query, int limit = 5)
+    {
+      var thread = new FB_User(threadId, session);
+      var m = await thread.searchMessages(query, offset: 0, limit);
+      var m2 = m.ToImmutableList();
+      return m2.Select(s => new MessengerMessage(s)).ToImmutableList();
+    }
+
+    public async Task<IReadOnlyList<MessengerMessage>> SearchThread(MessengerThread thread, string query, int limit = 5)
+    {
+      return await SearchThread(thread.Id, query, limit);
+    }
+
+    public async Task<IReadOnlyList<MessengerMessage>> SearchThread(MessengerUser user, string query, int limit = 5)
+    {
+      return await SearchThread(user.Id, query, limit);
     }
 
     public async Task LogoutAsync()
@@ -105,17 +129,27 @@ namespace CrowdedPrison.Messenger
       Users = users.Select(u => new MessengerUser(u)).ToImmutableDictionary(u => u.Id);
     }
 
-    public async Task<IReadOnlyList<MessengerThread>> GetThreadsAsync()
+    public async Task<IReadOnlyList<MessengerThread>> GetThreadsAsync(int limit = 20)
     {
-      var threads = await messenger.fetchThreadList();
+      var threads = await messenger.fetchThreadList(limit);
       var threads2 = threads.Select(t => new MessengerThread(t)).ToImmutableList();
       return threads2;
     }
 
-    public async Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerThread thread)
+    public MessengerUser GetUser(MessengerMessage message)
     {
-      var thread2 = new FB_Thread(thread.Id, session);
-      var messages = await thread2.fetchMessages();
+      return GetUser(message.AuthorId);
+    }
+
+    public MessengerThread GetThread(MessengerMessage message)
+    {
+      return 
+    }
+
+    public async Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(string threadId, int limit = 20)
+    {
+      var thread2 = new FB_Thread(threadId, session);
+      var messages = await thread2.fetchMessages(limit);
       var messages2 = messages.Select(m => new MessengerMessage(m)).ToImmutableList();
       return messages2;
     }

@@ -16,5 +16,10 @@ namespace CrowdedPrison.Messenger.Entities
       Id = thread.uid;
       PhotoUrl = thread.photo?.url;
     }
+
+    public override string ToString()
+    {
+      return Name;
+    }
   }
 }

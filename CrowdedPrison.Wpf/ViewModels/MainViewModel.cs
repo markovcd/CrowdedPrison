@@ -52,7 +52,9 @@ namespace CrowdedPrison.Wpf.ViewModels
       CreateMessenger();
       await messenger.LoginAsync();
       var threads = await messenger.GetThreadsAsync();
-      var messages = await messenger.GetMessagesAsync(threads.First());
+      var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
+      var m = await messenger.GetMessagesAsync(thread.Id, 100);
+
     }
 
 

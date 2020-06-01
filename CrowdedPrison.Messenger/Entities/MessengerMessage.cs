@@ -6,7 +6,7 @@ namespace CrowdedPrison.Messenger.Entities
   {
     public string Text { get; }
     public string ThreadId { get; }
-    public string Author { get; }
+    public string AuthorId { get; }
     public string Timestamp { get; }
     public string Id { get; }
     public bool IsRead { get; }
@@ -16,11 +16,16 @@ namespace CrowdedPrison.Messenger.Entities
     {
       Text = message.text;
       ThreadId = message.thread_id;
-      Author = message.author;
+      AuthorId = message.author;
       Timestamp = message.timestamp;
       Id = message.uid;
       IsRead = message.is_read;
       IsUnsent = message.unsent;
+    }
+
+    public override string ToString()
+    {
+      return $"{AuthorId}: {Text}";
     }
   }
 }
