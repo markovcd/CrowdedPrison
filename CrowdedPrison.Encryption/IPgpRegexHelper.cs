@@ -1,4 +1,4 @@
-﻿namespace CrowdedPrison.Core
+﻿namespace CrowdedPrison.Encryption
 {
   public interface IPgpRegexHelper
   {

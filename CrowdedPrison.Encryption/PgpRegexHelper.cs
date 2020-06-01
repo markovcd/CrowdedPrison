@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Encryption
 {
   public class PgpRegexHelper : IPgpRegexHelper
   {

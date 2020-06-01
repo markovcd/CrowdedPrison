@@ -1,4 +1,5 @@
 ﻿using CrowdedPrison.Messenger;
+using CrowdedPrison.Messenger.Encryption;
 using CrowdedPrison.Messenger.Events;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -14,15 +15,15 @@ namespace CrowdedPrison.Wpf.ViewModels
 {
   internal class MainViewModel : BindableBase
   {
-    private IMessenger messenger;
-    private readonly Func<IMessenger> messengerFactory;
+    private IGpgMessenger messenger;
+    private readonly Func<IGpgMessenger> messengerFactory;
     private readonly IDialogService dialogService;
     private readonly Func<LoginDialogViewModel> loginVmFactory;
     private readonly Func<TwoFactorDialogViewModel> twoFactorVmFactory;
 
     public ICommand ConnectCommand { get; }
 
-    public MainViewModel(Func<IMessenger> messengerFactory, IDialogService dialogService, 
+    public MainViewModel(Func<IGpgMessenger> messengerFactory, IDialogService dialogService, 
       Func<LoginDialogViewModel> loginVmFactory, Func<TwoFactorDialogViewModel> twoFactorVmFactory)
     {
       this.messengerFactory = messengerFactory;
@@ -57,7 +58,6 @@ namespace CrowdedPrison.Wpf.ViewModels
 
       try
       {
-        var gfdf = await messenger.SearchThread(messenger.Self, "-----BEGIN PGP MESSAGE----- -----END PGP MESSAGE-----");
        }
       catch (Exception ex)
       {

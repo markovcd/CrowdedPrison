@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Immutable;
 using CrowdedPrison.Common;
 
-namespace CrowdedPrison.Core
+namespace CrowdedPrison.Encryption
 {
   public class GpgException : Exception
   {

@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CrowdedPrison.Messenger.Encryption\CrowdedPrison.Messenger.Encryption.csproj" />
     <ProjectReference Include="..\CrowdedPrison.Messenger\CrowdedPrison.Messenger.csproj" />
   </ItemGroup>
 

@@ -32,7 +32,7 @@ namespace CrowdedPrison.Wpf
 
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
     {
-      moduleCatalog.AddModule<Messenger.Module>();
+      moduleCatalog.AddModule<Messenger.Encryption.Module>();
     }
   }
 }
