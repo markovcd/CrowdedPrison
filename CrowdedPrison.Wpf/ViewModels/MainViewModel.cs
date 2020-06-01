@@ -5,6 +5,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -16,13 +17,18 @@ namespace CrowdedPrison.Wpf.ViewModels
     private IMessenger messenger;
     private readonly Func<IMessenger> messengerFactory;
     private readonly IDialogService dialogService;
+    private readonly Func<LoginDialogViewModel> loginVmFactory;
+    private readonly Func<TwoFactorDialogViewModel> twoFactorVmFactory;
 
     public ICommand ConnectCommand { get; }
 
-    public MainViewModel(Func<IMessenger> messengerFactory, IDialogService dialogService)
+    public MainViewModel(Func<IMessenger> messengerFactory, IDialogService dialogService, 
+      Func<LoginDialogViewModel> loginVmFactory, Func<TwoFactorDialogViewModel> twoFactorVmFactory)
     {
       this.messengerFactory = messengerFactory;
       this.dialogService = dialogService;
+      this.loginVmFactory = loginVmFactory;
+      this.twoFactorVmFactory = twoFactorVmFactory;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
@@ -45,6 +51,8 @@ namespace CrowdedPrison.Wpf.ViewModels
     {
       CreateMessenger();
       await messenger.LoginAsync();
+      var threads = await messenger.GetThreadsAsync();
+      var messages = await messenger.GetMessagesAsync(threads.First());
     }
 
 
@@ -60,15 +68,15 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private async Task Messenger_UserLoginRequested(object sender, UserLoginEventArgs e)
     {
-      var vm = new LoginDialogViewModel();
-      vm.WelcomeText = "fgsdfgsdgd";
-      var b = await dialogService.ShowDialogAsync(vm);
-
+      var vm = loginVmFactory();
+      vm.Email = "markovcd@gmail.com";
+      (e.Email, e.Password, e.IsCancelled) = await dialogService.ShowDialogAsync(vm);
     }
 
     private async Task Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
     {
-
+      var vm = twoFactorVmFactory();
+      (e.TwoFactorCode, e.IsCancelled) = await dialogService.ShowDialogAsync(vm);
     }
 
     private void Messenger_MessagesDelivered(object sender, MessagesDeliveredEventArgs e)

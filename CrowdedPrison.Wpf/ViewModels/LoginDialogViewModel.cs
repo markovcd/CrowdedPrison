@@ -1,21 +1,15 @@
-﻿using System.Windows.Input;
+﻿using System.Windows.Controls;
+using System.Windows.Input;
 using Prism.Commands;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  public class LoginDialogViewModel : BaseDialogViewModel<bool>
+  public class LoginDialogViewModel : BaseDialogViewModel<(string email, string password, bool isCancelled)>
   {
-    private string welcomeText;
     private string email;
-    private string password;
 
-    public ICommand OkCommand => new DelegateCommand(() => SetResult(true));
-
-    public string WelcomeText
-    {
-      get => welcomeText;
-      set => SetProperty(ref welcomeText, value);
-    }
+    public ICommand OkCommand { get; }
+    public ICommand CancelCommand { get; }
 
     public string Email
     {
@@ -23,10 +17,20 @@ namespace CrowdedPrison.Wpf.ViewModels
       set => SetProperty(ref email, value);
     }
 
-    public string Password
+    public LoginDialogViewModel()
     {
-      get => password;
-      set => SetProperty(ref password, value);
+      OkCommand = new DelegateCommand<PasswordBox>(Ok);
+      CancelCommand = new DelegateCommand(Cancel);
+    }
+
+    private void Ok(PasswordBox passwordBox)
+    {
+      SetResult((Email, passwordBox.Password, false));
+    }
+
+    private void Cancel()
+    {
+      SetResult((null, null, true));
     }
   }
 }

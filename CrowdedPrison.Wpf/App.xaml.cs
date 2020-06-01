@@ -27,6 +27,7 @@ namespace CrowdedPrison.Wpf
       containerRegistry.RegisterForNavigation<MainView>();
       containerRegistry.Register<IDialogService, DialogService>();
       DialogService.Register<LoginDialogViewModel, LoginDialogView>();
+      DialogService.Register<TwoFactorDialogViewModel, TwoFactorDialogView>();
     }
 
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

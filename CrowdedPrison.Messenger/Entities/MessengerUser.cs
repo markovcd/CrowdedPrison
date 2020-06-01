@@ -1,4 +1,5 @@
-﻿using fbchat_sharp.API;
+﻿using System;
+using fbchat_sharp.API;
 
 namespace CrowdedPrison.Messenger.Entities
 {
@@ -15,7 +16,7 @@ namespace CrowdedPrison.Messenger.Entities
     public string OwnNickname { get; }
     public string Gender { get; }
     public bool IsActive { get; set; }
-    public string LastActive { get; set; }
+    public DateTime LastActive { get; set; }
 
     internal MessengerUser(FB_User user)
     {
@@ -29,6 +30,11 @@ namespace CrowdedPrison.Messenger.Entities
       Nickname = user.nickname;
       OwnNickname = user.own_nickname;
       Gender = user.gender;
+    }
+
+    public override string ToString()
+    {
+      return $"{Name}";
     }
   }
 }

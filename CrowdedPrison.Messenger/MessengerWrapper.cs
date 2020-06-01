@@ -314,8 +314,17 @@ namespace CrowdedPrison.Messenger
         var user = GetUser(fbUser);
         if (user == null) continue;
         user.IsActive = fbStatus.active;
-        user.LastActive = fbStatus.last_active;
+        user.LastActive = FromUnixEpoch(fbStatus.last_active);
       }
+    }
+
+    private static DateTime FromUnixEpoch(string s)
+    {
+      if (s == null) return default;
+
+      return long.TryParse(s, out var l) 
+        ? DateTimeOffset.FromUnixTimeSeconds(l).DateTime.ToLocalTime() 
+        : default;
     }
 
     private void OnLoggingIn(FB_LoggingIn loggingInEvent)
