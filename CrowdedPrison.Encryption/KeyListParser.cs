@@ -162,7 +162,7 @@ namespace CrowdedPrison.Core
           current = new List<KeyListField>();
         }
 
-        current.Add(field);
+        current?.Add(field);
       }
 
       if (current != null) total.Add(current);
@@ -191,8 +191,9 @@ namespace CrowdedPrison.Core
 
     private static string GetItem(IReadOnlyList<string> f, int index)
     {
-      if (index >= f.Count) return string.Empty;
-      return f[index];
+      return index >= f.Count
+        ? string.Empty 
+        : f[index];
     }
 
     private static KeyCababilities GetCapabilities(string s)
@@ -232,14 +233,16 @@ namespace CrowdedPrison.Core
 
     private static int ParseInteger(string s, int @default = default)
     {
-      if (int.TryParse(s, out var i)) return i;
-      return @default;
+      return int.TryParse(s, out var i) 
+        ? i 
+        : @default;
     }
 
     private static long ParseLong(string s, long @default = default)
     {
-      if (long.TryParse(s, out var i)) return i;
-      return @default;
+      return long.TryParse(s, out var i) 
+        ? i 
+        : @default;
     }
 
     private static KeyValidity GetValidity(string s)

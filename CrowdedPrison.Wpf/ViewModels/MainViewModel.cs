@@ -53,9 +53,9 @@ namespace CrowdedPrison.Wpf.ViewModels
       await messenger.LoginAsync();
     }
 
-    private async Task DisconnectAsync(bool logout = false)
+    private async Task DisconnectAsync()
     {
-      if (logout) await messenger.LogoutAsync();
+      await messenger.LogoutAsync();
       await DisposeMessengerAsync();
     }
 
@@ -91,7 +91,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private void Messenger_ConnectionStateChanged(object sender, ConnectionStateEventArgs e)
     {
-      
+      Debug.WriteLine($"{e.State} {e.Reason}");
     }
   }
 }

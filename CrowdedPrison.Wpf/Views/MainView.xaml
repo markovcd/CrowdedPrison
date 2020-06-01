@@ -12,5 +12,8 @@
   p:ViewModelLocator.AutoWireViewModel="True"
   x:ClassModifier="internal"
   mc:Ignorable="d">
-  <Button Command="{Binding ConnectCommand}" Content="Connect" />
+  <StackPanel>
+    <Button Command="{Binding ConnectCommand}" Content="Connect" />
+    <Button Command="{Binding DisconnectCommand}" Content="Disconnect" />
+  </StackPanel>
 </UserControl>

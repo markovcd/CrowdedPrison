@@ -62,8 +62,8 @@ namespace CrowdedPrison.Common
 
     private string AggregateData(bool isError = false)
     {
-      var d = Data.Where(d => d.IsError == isError).Select(d => d.Data);
-      return d.Any() ? d.Aggregate((a, b) => $"{a}\r\n{b}") : null;
+      var data = Data.Where(d => d.IsError == isError).Select(d => d.Data);
+      return data.Any() ? data.Aggregate((a, b) => $"{a}\r\n{b}") : null;
     }
 
     private void AddData(string data, bool isError = false)

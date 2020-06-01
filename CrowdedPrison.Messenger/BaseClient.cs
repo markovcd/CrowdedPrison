@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using fbchat_sharp.API;
-using Newtonsoft.Json;
 
 namespace CrowdedPrison.Messenger
 {

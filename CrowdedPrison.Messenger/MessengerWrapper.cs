@@ -14,8 +14,8 @@ namespace CrowdedPrison.Messenger
 {
   internal class MessengerWrapper : IMessenger
   {
-    private static readonly string appName = "FBChat-Sharp";
-    private static readonly string sessionFile = "SESSION_COOKIES_core.dat";
+    private const string appName = "FBChat-Sharp";
+    private const string sessionFile = "SESSION_COOKIES_core.dat";
 
     private readonly BaseClient messenger;
     private Session session;
@@ -161,7 +161,7 @@ namespace CrowdedPrison.Messenger
       MessageReceived?.Invoke(this, args);
     }
 
-    protected string OnTwoFactorRequested()
+    protected virtual string OnTwoFactorRequested()
     {
       var args = new TwoFactorEventArgs();
       TwoFactorRequested?.Invoke(this, args);
@@ -169,7 +169,7 @@ namespace CrowdedPrison.Messenger
       return args.TwoFactorCode;
     }
 
-    protected (string email, string password) OnUserLoginRequested()
+    protected virtual (string email, string password) OnUserLoginRequested()
     {
       var args = new UserLoginEventArgs();
       UserLoginRequested?.Invoke(this, args);
@@ -182,9 +182,9 @@ namespace CrowdedPrison.Messenger
       if (Users.TryGetValue(id, out var user))
         return user;
 
-      if (Self?.Id == id) return Self;
-
-      return null;
+      return Self?.Id == id 
+        ? Self 
+        : null;
     }
 
     private MessengerUser GetUser(FB_User author)
@@ -198,11 +198,11 @@ namespace CrowdedPrison.Messenger
     {
       var file = Path.Combine(UserDataFolder, sessionFile);
 
-      using var fileStream = File.Create(file);
+      await using var fileStream = File.Create(file);
       try
       {
         using var jsonWriter = new JsonTextWriter(new StreamWriter(fileStream));
-        JsonSerializer serializer = new JsonSerializer();
+        var serializer = new JsonSerializer();
         serializer.Serialize(jsonWriter, cookieJar);
         await jsonWriter.FlushAsync();
       }
@@ -217,8 +217,7 @@ namespace CrowdedPrison.Messenger
       try
       {
         var file = Path.Combine(UserDataFolder, sessionFile);
-        using var fileStream = File.OpenRead(file);
-        await Task.Yield();
+        await using var fileStream = File.OpenRead(file);
         using var jsonTextReader = new JsonTextReader(new StreamReader(fileStream));
         var serializer = new JsonSerializer();
         return serializer.Deserialize<Dictionary<string, List<Cookie>>>(jsonTextReader);
@@ -264,8 +263,8 @@ namespace CrowdedPrison.Messenger
         case FB_LoggedIn loggedInEvent:
           OnLoggedIn(loggedInEvent);
           break;
-        case FB_LoggedOut loggedOutEvent:
-          OnLoggedOut(loggedOutEvent);
+        case FB_LoggedOut _:
+          OnLoggedOut();
           break;
         case FB_LoggingIn loggingInEvent:
           OnLoggingIn(loggingInEvent);
@@ -278,8 +277,6 @@ namespace CrowdedPrison.Messenger
           break;
         case FB_UnsendEvent unsendEvent:
           OnMessageUnsent(unsendEvent);
-          break;
-        default:
           break;
       }
     }
@@ -308,12 +305,12 @@ namespace CrowdedPrison.Messenger
 
     private void OnPresence(FB_Presence presenceEvent)
     {
-      foreach (var status in presenceEvent.statuses)
+      foreach (var (fbUser, fbStatus) in presenceEvent.statuses)
       {
-        var user = GetUser(status.Key);
+        var user = GetUser(fbUser);
         if (user == null) continue;
-        user.IsActive = status.Value.active;
-        user.LastActive = status.Value.last_active;
+        user.IsActive = fbStatus.active;
+        user.LastActive = fbStatus.last_active;
       }
     }
 
@@ -322,7 +319,7 @@ namespace CrowdedPrison.Messenger
       OnConnectionStateChanged(MessengerConnectionState.LoggingIn, loggingInEvent.Email);
     }
 
-    private void OnLoggedOut(FB_LoggedOut loggedOutEvent)
+    private void OnLoggedOut()
     {
       OnConnectionStateChanged(MessengerConnectionState.LoggedOut);
     }
