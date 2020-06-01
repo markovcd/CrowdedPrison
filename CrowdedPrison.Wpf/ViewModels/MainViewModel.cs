@@ -15,16 +15,16 @@ namespace CrowdedPrison.Wpf.ViewModels
   {
     private IMessenger messenger;
     private readonly Func<IMessenger> messengerFactory;
+    private readonly IDialogService dialogService;
 
     public ICommand ConnectCommand { get; }
-    public ICommand DisconnectCommand { get; }
 
-    public MainViewModel(Func<IMessenger> messengerFactory)
+    public MainViewModel(Func<IMessenger> messengerFactory, IDialogService dialogService)
     {
       this.messengerFactory = messengerFactory;
+      this.dialogService = dialogService;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
-      DisconnectCommand = new DelegateCommand(() => DisconnectAsync());
 
     }
 
@@ -41,23 +41,12 @@ namespace CrowdedPrison.Wpf.ViewModels
       messenger.Typing += Messenger_Typing;
     }
 
-    private async Task DisposeMessengerAsync()
-    {
-      await messenger.DisposeAsync();
-      messenger = null;
-    }
-
     private async Task ConnectAsync()
     {
       CreateMessenger();
       await messenger.LoginAsync();
     }
 
-    private async Task DisconnectAsync()
-    {
-      await messenger.LogoutAsync();
-      await DisposeMessengerAsync();
-    }
 
     private void Messenger_Typing(object sender, TypingEventArgs e)
     {
@@ -69,14 +58,17 @@ namespace CrowdedPrison.Wpf.ViewModels
       
     }
 
-    private void Messenger_UserLoginRequested(object sender, UserLoginEventArgs e)
+    private async Task Messenger_UserLoginRequested(object sender, UserLoginEventArgs e)
     {
-      
+      var vm = new LoginDialogViewModel();
+      vm.WelcomeText = "fgsdfgsdgd";
+      var b = await dialogService.ShowDialogAsync(vm);
+
     }
 
-    private void Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
+    private async Task Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
     {
-      
+
     }
 
     private void Messenger_MessagesDelivered(object sender, MessagesDeliveredEventArgs e)

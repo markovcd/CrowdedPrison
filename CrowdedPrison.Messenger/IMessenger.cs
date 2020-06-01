@@ -6,13 +6,15 @@ using CrowdedPrison.Messenger.Events;
 
 namespace CrowdedPrison.Messenger
 {
+  public delegate Task AsyncEventHandler<in TEventArgs>(object sender, TEventArgs e) where TEventArgs : EventArgs;
+
   public interface IMessenger : IAsyncDisposable
   {
     IReadOnlyDictionary<string, MessengerUser> Users { get; }
     MessengerUser Self { get; }
 
-    event EventHandler<TwoFactorEventArgs> TwoFactorRequested;
-    event EventHandler<UserLoginEventArgs> UserLoginRequested;
+    event AsyncEventHandler<TwoFactorEventArgs> TwoFactorRequested;
+    event AsyncEventHandler<UserLoginEventArgs> UserLoginRequested;
     event EventHandler<MessageReceivedEventArgs> MessageReceived;
     event EventHandler<ConnectionStateEventArgs> ConnectionStateChanged;
     event EventHandler<MessagesDeliveredEventArgs> MessagesDelivered;

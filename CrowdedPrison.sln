@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Encryption", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Messenger", "CrowdedPrison.Messenger\CrowdedPrison.Messenger.csproj", "{FEBDC0F0-4F0F-401A-BBB6-F1A7F733CDFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowdedPrison.Common", "CrowdedPrison.Common\CrowdedPrison.Common.csproj", "{B37543BB-15ED-4312-889D-0970C0207032}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Common", "CrowdedPrison.Common\CrowdedPrison.Common.csproj", "{B37543BB-15ED-4312-889D-0970C0207032}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowdedPrison.Wpf", "CrowdedPrison.Wpf\CrowdedPrison.Wpf.csproj", "{0BE99865-69DD-40AD-A74B-E6370B83D13E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Wpf", "CrowdedPrison.Wpf\CrowdedPrison.Wpf.csproj", "{0BE99865-69DD-40AD-A74B-E6370B83D13E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowdedPrison.Tests", "CrowdedPrison.Tests\CrowdedPrison.Tests.csproj", "{3B00C00B-6F24-4ED7-A9CB-73456368AEF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Tests", "CrowdedPrison.Tests\CrowdedPrison.Tests.csproj", "{3B00C00B-6F24-4ED7-A9CB-73456368AEF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -20,8 +20,8 @@ namespace CrowdedPrison.Messenger
     private readonly BaseClient messenger;
     private Session session;
 
-    public event EventHandler<TwoFactorEventArgs> TwoFactorRequested;
-    public event EventHandler<UserLoginEventArgs> UserLoginRequested;
+    public event AsyncEventHandler<TwoFactorEventArgs> TwoFactorRequested;
+    public event AsyncEventHandler<UserLoginEventArgs> UserLoginRequested;
     public event EventHandler<MessageReceivedEventArgs> MessageReceived;
     public event EventHandler<ConnectionStateEventArgs> ConnectionStateChanged;
     public event EventHandler<MessagesDeliveredEventArgs> MessagesDelivered;
@@ -46,7 +46,7 @@ namespace CrowdedPrison.Messenger
     {
       messenger = new BaseClient
       {
-        On2FACodeCallback = GetTwoFactorCode,
+        On2FACodeCallback = OnTwoFactorRequestedAsync,
         FbEventCallback = OnFbEventCallback,
         DeleteCookiesCallback = OnDeleteCookiesCallback,
         ReadCookiesFromDiskCallback = OnReadCookiesFromDiskCallback,
@@ -65,7 +65,7 @@ namespace CrowdedPrison.Messenger
       session = await messenger.TryLogin();
       if (session == null)
       {
-        var (email, password) = OnUserLoginRequested();
+        var (email, password) = await OnUserLoginRequestedAsync();
         session = await messenger.DoLogin(email, password) 
                   ?? await messenger.DoLogin(email, password);
       }
@@ -161,18 +161,22 @@ namespace CrowdedPrison.Messenger
       MessageReceived?.Invoke(this, args);
     }
 
-    protected virtual string OnTwoFactorRequested()
+    protected virtual async Task<string> OnTwoFactorRequestedAsync()
     {
       var args = new TwoFactorEventArgs();
-      TwoFactorRequested?.Invoke(this, args);
+      if (TwoFactorRequested != null)
+        await TwoFactorRequested(this, args);
+
       if (args.IsCancelled) throw new OperationCanceledException();
       return args.TwoFactorCode;
     }
 
-    protected virtual (string email, string password) OnUserLoginRequested()
+    protected virtual async Task<(string email, string password)> OnUserLoginRequestedAsync()
     {
       var args = new UserLoginEventArgs();
-      UserLoginRequested?.Invoke(this, args);
+      if (UserLoginRequested != null)
+        await UserLoginRequested(this, args);
+
       if (args.IsCancelled) throw new OperationCanceledException();
       return (args.Email, args.Password);
     }
@@ -364,12 +368,5 @@ namespace CrowdedPrison.Messenger
 
       OnMessageReceived(user, message);
     }
-
-    private async Task<string> GetTwoFactorCode()
-    {
-      await Task.Yield();
-      return OnTwoFactorRequested();
-    }
-
   }
 }
