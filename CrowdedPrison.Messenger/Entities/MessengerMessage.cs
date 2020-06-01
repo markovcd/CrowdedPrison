@@ -1,4 +1,6 @@
-﻿using fbchat_sharp.API;
+﻿using CrowdedPrison.Messenger.Extensions;
+using fbchat_sharp.API;
+using System;
 
 namespace CrowdedPrison.Messenger.Entities
 {
@@ -7,7 +9,7 @@ namespace CrowdedPrison.Messenger.Entities
     public string Text { get; }
     public string ThreadId { get; }
     public string AuthorId { get; }
-    public string Timestamp { get; }
+    public DateTime Timestamp { get; }
     public string Id { get; }
     public bool IsRead { get; }
     public bool IsUnsent { get; }
@@ -17,7 +19,7 @@ namespace CrowdedPrison.Messenger.Entities
       Text = message.text;
       ThreadId = message.thread_id;
       AuthorId = message.author;
-      Timestamp = message.timestamp;
+      Timestamp = message.timestamp?.FromUnixEpoch(true) ?? default;
       Id = message.uid;
       IsRead = message.is_read;
       IsUnsent = message.unsent;

@@ -9,6 +9,7 @@ using CrowdedPrison.Messenger.Events;
 using System.Net;
 using Newtonsoft.Json;
 using System.IO;
+using CrowdedPrison.Messenger.Extensions;
 
 namespace CrowdedPrison.Messenger
 {
@@ -101,7 +102,7 @@ namespace CrowdedPrison.Messenger
 
     public async Task<IReadOnlyList<MessengerMessage>> SearchThread(string threadId, string query, int limit = 5)
     {
-      var thread = new FB_User(threadId, session);
+      var thread = new FB_Thread(threadId, session);
       var m = await thread.searchMessages(query, offset: 0, limit);
       var m2 = m.ToImmutableList();
       return m2.Select(s => new MessengerMessage(s)).ToImmutableList();
@@ -141,11 +142,15 @@ namespace CrowdedPrison.Messenger
       return GetUser(message.AuthorId);
     }
 
+    public async Task<IReadOnlyList<MessengerThread>> GetThreadsAsync(IEnumerable<string> threadIds)
+    {
+      var fbThreads = await messenger.fetchThreadInfo(threadIds.ToList());
+      return fbThreads.Values.Select(t => new MessengerThread(t)).ToImmutableList();
+    }
+
     public async Task<MessengerThread> GetThreadAsync(string threadId)
     {
-      var d = await messenger.fetchThreadInfo(new List<string> { threadId });
-      var fbThread = d?.FirstOrDefault().Value;
-      return fbThread == null ? null : new MessengerThread(fbThread);
+      return (await GetThreadsAsync(new[] { threadId })).FirstOrDefault();
     }
 
     public async Task<MessengerThread> GetThreadAsync(MessengerMessage message)
@@ -358,17 +363,8 @@ namespace CrowdedPrison.Messenger
         var user = GetUser(fbUser);
         if (user == null) continue;
         user.IsActive = fbStatus.active;
-        user.LastActive = FromUnixEpoch(fbStatus.last_active);
+        user.LastActive = fbStatus.last_active.FromUnixEpoch();
       }
-    }
-
-    private static DateTime FromUnixEpoch(string s)
-    {
-      if (s == null) return default;
-
-      return long.TryParse(s, out var l) 
-        ? DateTimeOffset.FromUnixTimeSeconds(l).DateTime.ToLocalTime() 
-        : default;
     }
 
     private void OnLoggingIn(FB_LoggingIn loggingInEvent)
@@ -401,7 +397,7 @@ namespace CrowdedPrison.Messenger
       var user = GetUser(messagesDeliveredEvent.author);
       var messages = messagesDeliveredEvent.messages?.Select(m => new MessengerMessage(m)).ToImmutableList();
       var thread = new MessengerThread(messagesDeliveredEvent.thread);
-      var at = DateTimeOffset.FromUnixTimeSeconds(messagesDeliveredEvent.at).DateTime;
+      var at = messagesDeliveredEvent.at.FromUnixEpoch();
       OnMessagesDelivered(user, messages, thread, at);
     }
 

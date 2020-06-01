@@ -29,14 +29,15 @@ namespace CrowdedPrison.Messenger
     Task<bool> SendTextAsync(MessengerThread thread, string message);
     Task<bool> CheckConnectionStateAsync();
     Task<IReadOnlyList<MessengerThread>> GetThreadsAsync(int limit = 20);
+    Task<MessengerThread> GetThreadAsync(string threadId);
+    Task<MessengerThread> GetThreadAsync(MessengerMessage message);
+    Task<IReadOnlyList<MessengerThread>> GetThreadsAsync(IEnumerable<string> threadIds);
     Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(string threadId, int limit = 20);
     Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerUser user, int limit = 20);
     Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerThread thread, int limit = 20);
     Task<IReadOnlyList<MessengerMessage>> SearchThread(string threadId, string query, int limit = 5);
     Task<IReadOnlyList<MessengerMessage>> SearchThread(MessengerThread thread, string query, int limit = 5);
     Task<IReadOnlyList<MessengerMessage>> SearchThread(MessengerUser user, string query, int limit = 5);
-    Task<MessengerThread> GetThreadAsync(string threadId);
-    Task<MessengerThread> GetThreadAsync(MessengerMessage message);
     MessengerUser GetUser(MessengerMessage message);
     Task<IReadOnlyList<string>> GetUnreadThreadIds();
   }

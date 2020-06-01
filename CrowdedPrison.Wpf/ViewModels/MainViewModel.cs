@@ -54,13 +54,12 @@ namespace CrowdedPrison.Wpf.ViewModels
       //var threads = await messenger.GetThreadsAsync();
       //var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
       //var m = await messenger.GetMessagesAsync(thread.Id, 100);
-      var unread = await messenger.GetUnreadThreadIds();
+
       try
       {
-        var t1 = await messenger.GetThreadAsync(unread[0]);
-        var t2 = await messenger.GetThreadAsync(unread[1]);
-      }
-      catch (Exception ex )
+        var gfdf = await messenger.SearchThread(messenger.Self, "-----BEGIN PGP MESSAGE----- -----END PGP MESSAGE-----");
+       }
+      catch (Exception ex)
       {
 
         throw;
