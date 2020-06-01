@@ -51,10 +51,20 @@ namespace CrowdedPrison.Wpf.ViewModels
     {
       CreateMessenger();
       await messenger.LoginAsync();
-      var threads = await messenger.GetThreadsAsync();
-      var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
-      var m = await messenger.GetMessagesAsync(thread.Id, 100);
+      //var threads = await messenger.GetThreadsAsync();
+      //var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
+      //var m = await messenger.GetMessagesAsync(thread.Id, 100);
+      var unread = await messenger.GetUnreadThreadIds();
+      try
+      {
+        var t1 = await messenger.GetThreadAsync(unread[0]);
+        var t2 = await messenger.GetThreadAsync(unread[1]);
+      }
+      catch (Exception ex )
+      {
 
+        throw;
+      }
     }
 
 

@@ -141,9 +141,21 @@ namespace CrowdedPrison.Messenger
       return GetUser(message.AuthorId);
     }
 
-    public MessengerThread GetThread(MessengerMessage message)
+    public async Task<MessengerThread> GetThreadAsync(string threadId)
     {
-      return 
+      var d = await messenger.fetchThreadInfo(new List<string> { threadId });
+      var fbThread = d?.FirstOrDefault().Value;
+      return fbThread == null ? null : new MessengerThread(fbThread);
+    }
+
+    public async Task<MessengerThread> GetThreadAsync(MessengerMessage message)
+    {
+      return await GetThreadAsync(message.ThreadId);
+    }
+
+    public async Task<IReadOnlyList<string>> GetUnreadThreadIds()
+    {
+      return await messenger.fetchUnread();
     }
 
     public async Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(string threadId, int limit = 20)
@@ -154,16 +166,14 @@ namespace CrowdedPrison.Messenger
       return messages2;
     }
 
-    public async Task UpdateActiveUsersAsync()
+    public async Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerThread thread, int limit = 20)
     {
-      if (Users == null) await UpdateUsersAsync();
+      return await GetMessagesAsync(thread.Id, limit);
+    }
 
-      var activeIds = new HashSet<string>(await messenger.fetchActiveUsers());
-
-      foreach (var user in Users.Values)
-      {
-        user.IsActive = activeIds.Contains(user.Id);
-      }
+    public async Task<IReadOnlyList<MessengerMessage>> GetMessagesAsync(MessengerUser user, int limit = 20)
+    {
+      return await GetMessagesAsync(user.Id, limit);
     }
 
     public async ValueTask DisposeAsync()
@@ -219,7 +229,7 @@ namespace CrowdedPrison.Messenger
     {
       if (Users.TryGetValue(id, out var user))
         return user;
-
+      
       return Self?.Id == id 
         ? Self 
         : null;

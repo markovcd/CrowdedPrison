@@ -1,0 +1,3 @@
+[submodule "fbchat-sharp"]
+	path = fbchat-sharp
+	url = https://github.com/gave92/fbchat-sharp.git
