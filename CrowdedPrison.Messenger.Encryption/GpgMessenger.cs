@@ -36,10 +36,12 @@ namespace CrowdedPrison.Messenger.Encryption
     public async Task<string> GetPublicKeyAsync(MessengerUser user)
     {
       const string pattern = "-----BEGIN PGP PUBLIC KEY BLOCK----- -----END PGP PUBLIC KEY BLOCK-----";
-      var message = (await messenger.SearchThread(user, pattern, 1)).FirstOrDefault();
-      if (message == null) return null;
-
-      return pgpHelper.GetPublicKeyBlock(message.Text);
+      var messages = await messenger.SearchThread(user, pattern, 50);
+      
+      return messages
+        .OrderByDescending(m => m.Timestamp)
+        .Select(m => pgpHelper.GetPublicKeyBlock(m.Text))
+        .FirstOrDefault(s => !string.IsNullOrEmpty(s));
     }
 
     public async Task<bool> SendPublicKeyAsync(MessengerUser user)

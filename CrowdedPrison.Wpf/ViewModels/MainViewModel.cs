@@ -50,8 +50,7 @@ namespace CrowdedPrison.Wpf.ViewModels
       //var threads = await messenger.GetThreadsAsync();
       //var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
       //var m = await messenger.GetMessagesAsync(thread.Id, 100);
-
- 
+      var b = await gpgMessenger.ImportPublicKeyAsync(messenger.Self);
     }
 
 
