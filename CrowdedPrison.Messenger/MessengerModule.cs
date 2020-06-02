@@ -3,7 +3,7 @@ using Prism.Modularity;
 
 namespace CrowdedPrison.Messenger
 {
-  public class Module : IModule
+  public class MessengerModule : IModule
   {
     public void OnInitialized(IContainerProvider containerProvider)
     {
@@ -12,7 +12,7 @@ namespace CrowdedPrison.Messenger
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-      containerRegistry.Register<IMessenger, MessengerWrapper>();
+      containerRegistry.RegisterSingleton<IMessenger, MessengerWrapper>();
     }
   }
 }

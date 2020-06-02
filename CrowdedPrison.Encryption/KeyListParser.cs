@@ -90,7 +90,7 @@ namespace CrowdedPrison.Encryption
     public string Id { get; set; }
   }
 
-  public class KeyListParser
+  internal class KeyListParser
   {
     public static IReadOnlyList<GpgKey> GpgKeysFromFields(IEnumerable<IEnumerable<KeyListField>> fields)
     {

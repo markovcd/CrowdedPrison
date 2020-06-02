@@ -3,6 +3,10 @@ using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
 using System.Windows;
+using CrowdedPrison.Common;
+using CrowdedPrison.Encryption;
+using CrowdedPrison.Messenger;
+using CrowdedPrison.Messenger.Encryption;
 using CrowdedPrison.Wpf.ViewModels;
 
 namespace CrowdedPrison.Wpf
@@ -23,6 +27,11 @@ namespace CrowdedPrison.Wpf
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
       containerRegistry.RegisterSingleton<Shell>();
+      containerRegistry.RegisterSingleton<AppConfiguration>();
+
+      var appConfig = new AppConfiguration();
+      containerRegistry.RegisterInstance<IGpgConfiguration>(appConfig);
+      containerRegistry.RegisterInstance<IGpgMessengerConfiguration>(appConfig);
 
       containerRegistry.RegisterForNavigation<MainView>();
       containerRegistry.Register<IDialogService, DialogService>();
@@ -32,7 +41,10 @@ namespace CrowdedPrison.Wpf
 
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
     {
-      moduleCatalog.AddModule<Messenger.Encryption.Module>();
+      moduleCatalog.AddModule<CommonModule>();
+      moduleCatalog.AddModule<EncryptionModule>();
+      moduleCatalog.AddModule<MessengerModule>();
+      moduleCatalog.AddModule<MessengerEncryptionModule>();
     }
   }
 }

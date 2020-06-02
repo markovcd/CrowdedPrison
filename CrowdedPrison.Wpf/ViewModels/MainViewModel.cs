@@ -4,40 +4,34 @@ using CrowdedPrison.Messenger.Events;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CrowdedPrison.Messenger.Encryption.Events;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
   internal class MainViewModel : BindableBase
   {
-    private IGpgMessenger messenger;
-    private readonly Func<IGpgMessenger> messengerFactory;
+    private readonly IMessenger messenger;
+    private readonly IGpgMessenger gpgMessenger;
     private readonly IDialogService dialogService;
     private readonly Func<LoginDialogViewModel> loginVmFactory;
     private readonly Func<TwoFactorDialogViewModel> twoFactorVmFactory;
 
     public ICommand ConnectCommand { get; }
 
-    public MainViewModel(Func<IGpgMessenger> messengerFactory, IDialogService dialogService, 
+    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IDialogService dialogService, 
       Func<LoginDialogViewModel> loginVmFactory, Func<TwoFactorDialogViewModel> twoFactorVmFactory)
     {
-      this.messengerFactory = messengerFactory;
+      this.messenger = messenger;
+      this.gpgMessenger = gpgMessenger;
+
       this.dialogService = dialogService;
       this.loginVmFactory = loginVmFactory;
       this.twoFactorVmFactory = twoFactorVmFactory;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
-
-    }
-
-    private void CreateMessenger()
-    {
-      messenger = messengerFactory();
 
       messenger.ConnectionStateChanged += Messenger_ConnectionStateChanged;
       messenger.MessageReceived += Messenger_MessageReceived;
@@ -46,24 +40,22 @@ namespace CrowdedPrison.Wpf.ViewModels
       messenger.UserLoginRequested += Messenger_UserLoginRequested;
       messenger.MessageUnsent += Messenger_MessageUnsent;
       messenger.Typing += Messenger_Typing;
+      gpgMessenger.EncryptedMessageReceived += GpgMessenger_EncryptedMessageReceived;
+    }
+
+    private void GpgMessenger_EncryptedMessageReceived(object sender, EncryptedMessageReceivedEventArgs e)
+    {
+      Debug.WriteLine(e.DecryptedText);
     }
 
     private async Task ConnectAsync()
     {
-      CreateMessenger();
       await messenger.LoginAsync();
       //var threads = await messenger.GetThreadsAsync();
       //var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
       //var m = await messenger.GetMessagesAsync(thread.Id, 100);
 
-      try
-      {
-       }
-      catch (Exception ex)
-      {
-
-        throw;
-      }
+ 
     }
 
 

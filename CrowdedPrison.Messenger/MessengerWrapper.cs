@@ -13,7 +13,7 @@ using CrowdedPrison.Messenger.Extensions;
 
 namespace CrowdedPrison.Messenger
 {
-  public class MessengerWrapper : IMessenger
+  internal class MessengerWrapper : IMessenger
   {
     private const string appName = "FBChat-Sharp";
     private const string sessionFile = "SESSION_COOKIES_core.dat";

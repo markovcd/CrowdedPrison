@@ -2,7 +2,7 @@
 
 namespace CrowdedPrison.Encryption
 {
-  public class PgpRegexHelper : IPgpRegexHelper
+  internal class PgpRegexHelper : IPgpRegexHelper
   {
     private const RegexOptions DefaultOptions = RegexOptions.Compiled | RegexOptions.Multiline;
     

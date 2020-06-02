@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace CrowdedPrison.Common
 {
-  public class FileSystem : IFileSystem
+  internal class FileSystem : IFileSystem
   {
     public string GetTempFilePath()
     {
@@ -25,8 +25,13 @@ namespace CrowdedPrison.Common
 
     public async Task WriteAllTextAsync(string fileName, string text)
     {
-      using var streamWriter = new StreamWriter(fileName);
+      await using var streamWriter = new StreamWriter(fileName);
       await streamWriter.WriteAsync(text);
+    }
+
+    public void CreateDirectory(string directoryName)
+    {
+      Directory.CreateDirectory(directoryName);
     }
   }
 }

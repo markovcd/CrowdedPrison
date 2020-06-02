@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CrowdedPrison.Common
 {
-  public class AsyncProcess : IAsyncProcess, IDisposable
+  internal class AsyncProcess : IAsyncProcess, IDisposable
   {
     private TaskCompletionSource<object> tcs;
     private Process process;

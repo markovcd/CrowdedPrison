@@ -1,10 +1,9 @@
-﻿using CrowdedPrison.Messenger.Encryption;
-using Prism.Ioc;
+﻿using Prism.Ioc;
 using Prism.Modularity;
 
 namespace CrowdedPrison.Messenger.Encryption
 {
-  public class Module : IModule
+  public class MessengerEncryptionModule : IModule
   {
     public void OnInitialized(IContainerProvider containerProvider)
     {
@@ -13,7 +12,7 @@ namespace CrowdedPrison.Messenger.Encryption
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-      containerRegistry.Register<IGpgMessenger, GpgMessenger>();
+      containerRegistry.RegisterSingleton<IGpgMessenger, GpgMessenger>();
     }
   }
 }

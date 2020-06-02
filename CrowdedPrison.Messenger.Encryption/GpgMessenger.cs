@@ -8,42 +8,35 @@ using CrowdedPrison.Messenger.Entities;
 
 namespace CrowdedPrison.Messenger.Encryption
 {
-  public class GpgMessenger : MessengerWrapper, IGpgMessenger
+  public class GpgMessenger : IGpgMessenger
   {
     private readonly IGpg gpg;
     private readonly IPgpRegexHelper pgpHelper;
-    private SecureString password;
+    private readonly IMessenger messenger;
+    private readonly IGpgMessengerConfiguration configuration;
 
     public event EventHandler<EncryptedMessageReceivedEventArgs> EncryptedMessageReceived;
 
-    public string Password
-    {
-      get => password.ToString();
-      set
-      {
-        password = new SecureString();
-        if (value == null) return;
 
-        foreach (var c in value)
-          password.AppendChar(c);
-      }
-    }
-
-    public GpgMessenger(IGpg gpg, IPgpRegexHelper pgpHelper)
+    public GpgMessenger(IGpg gpg, IPgpRegexHelper pgpHelper, IMessenger messenger, IGpgMessengerConfiguration configuration)
     { 
       this.gpg = gpg;
       this.pgpHelper = pgpHelper;
+      this.messenger = messenger;
+      this.configuration = configuration;
+
+      messenger.MessageReceived += Messenger_MessageReceived;
     }
 
     public async Task<bool> GeneratePrivateKey()
     {
-      return await gpg.GenerateKeyAsync(Self.Id, Password);
+      return await gpg.GenerateKeyAsync(messenger.Self.Id, configuration.GpgPassword);
     }
 
     public async Task<string> GetPublicKeyAsync(MessengerUser user)
     {
-      var pattern = "-----BEGIN PGP PUBLIC KEY BLOCK----- -----END PGP PUBLIC KEY BLOCK-----";
-      var message = (await SearchThread(user, pattern, 1)).FirstOrDefault();
+      const string pattern = "-----BEGIN PGP PUBLIC KEY BLOCK----- -----END PGP PUBLIC KEY BLOCK-----";
+      var message = (await messenger.SearchThread(user, pattern, 1)).FirstOrDefault();
       if (message == null) return null;
 
       return pgpHelper.GetPublicKeyBlock(message.Text);
@@ -51,8 +44,8 @@ namespace CrowdedPrison.Messenger.Encryption
 
     public async Task<bool> SendPublicKeyAsync(MessengerUser user)
     {
-      var publicKey = await gpg.ExportKeyAsync(Self.Id);
-      return await SendTextAsync(user, publicKey);
+      var publicKey = await gpg.ExportKeyAsync(messenger.Self.Id);
+      return await messenger.SendTextAsync(user, publicKey);
     }
 
     public async Task<bool> ImportPublicKeyAsync(MessengerUser user)
@@ -65,21 +58,22 @@ namespace CrowdedPrison.Messenger.Encryption
     public async Task<bool> SendEncryptedTextAsync(MessengerUser user, string text)
     {
       var encrypted = await gpg.EncryptAsync(text, user.Id);
-      return await SendTextAsync(user, encrypted);
+      return await messenger.SendTextAsync(user, encrypted);
     }
 
-    protected override void OnMessageReceived(MessengerUser user, MessengerMessage message, MessengerMessage replyTo = null)
+    private async void Messenger_MessageReceived(object sender, Messenger.Events.MessageReceivedEventArgs e)
     {
-      var encrypted = pgpHelper.GetMessageBlock(message.Text);
-      if (string.IsNullOrEmpty(encrypted))
-        base.OnMessageReceived(user, message, replyTo);
-      else
-        OnEncryptedMessageReceived(encrypted, user, message, replyTo);
+      var encrypted = pgpHelper.GetMessageBlock(e.Message.Text);
+      if (string.IsNullOrEmpty(encrypted)) 
+        return;
+
+      var decrypted = await gpg.DecryptAsync(encrypted, configuration.GpgPassword);
+      if (!string.IsNullOrEmpty(decrypted))
+        OnEncryptedMessageReceived(decrypted, e.User, e.Message, e.ReplyTo);
     }
 
-    protected async void OnEncryptedMessageReceived(string encrypted, MessengerUser user, MessengerMessage message, MessengerMessage replyTo = null)
+    protected virtual void OnEncryptedMessageReceived(string decrypted, MessengerUser user, MessengerMessage message, MessengerMessage replyTo = null)
     {
-      var decrypted = await gpg.DecryptAsync(encrypted, Password);
       var args = new EncryptedMessageReceivedEventArgs(decrypted, user, message, replyTo);
       EncryptedMessageReceived?.Invoke(this, args);
     }

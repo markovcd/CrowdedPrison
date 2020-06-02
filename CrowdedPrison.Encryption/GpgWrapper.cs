@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Immutable;
@@ -8,23 +7,20 @@ using CrowdedPrison.Common;
 
 namespace CrowdedPrison.Encryption
 {
-  public class GpgException : Exception
-  {
-    public GpgException(string message) : base(message) { }
-  }
-
-  public class GpgWrapper : IGpg
+  internal class GpgWrapper : IGpg
   {
     private readonly Func<IAsyncProcess> processFactory;
     private readonly IFileSystem fileSystem;
+    private readonly IGpgConfiguration configuration;
 
-    public string GpgPath { get; set; } = @"C:\Users\marko\Desktop\GnuPg\gpg.exe";
-    public string HomeDir { get; set; }
+    private string GpgPath => configuration.GpgPath;
+    private string HomeDir => configuration.HomeDir;
 
-    public GpgWrapper(Func<IAsyncProcess> processFactory, IFileSystem fileSystem)
+    public GpgWrapper(Func<IAsyncProcess> processFactory, IFileSystem fileSystem, IGpgConfiguration configuration)
     {
       this.processFactory = processFactory;
       this.fileSystem = fileSystem;
+      this.configuration = configuration;
     }
 
     public Task<string> EncryptAsync(string text, string name)
@@ -125,7 +121,6 @@ namespace CrowdedPrison.Encryption
       }
     }
 
-
     private async Task<bool> InOperationAsync(string data, Func<string, Task<bool>> operation)
     {
       var tempFileName = fileSystem.GetTempFilePath();
@@ -182,7 +177,7 @@ namespace CrowdedPrison.Encryption
       {
         if (!string.IsNullOrEmpty(HomeDir))
         {
-          Directory.CreateDirectory(HomeDir);
+          fileSystem.CreateDirectory(HomeDir);
           command = $"--homedir {HomeDir} {command}";
         }
         p.Start(GpgPath, command);
