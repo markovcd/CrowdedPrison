@@ -14,7 +14,7 @@ namespace CrowdedPrison.Encryption
     {
       containerRegistry.RegisterSingleton<IGpg, GpgWrapper>();
       containerRegistry.RegisterSingleton<IPgpRegexHelper, PgpRegexHelper>();
-
+      containerRegistry.RegisterSingleton<IGpgDownloader, GpgDownloader>();
 
     }
   }

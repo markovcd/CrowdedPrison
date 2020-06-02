@@ -1,9 +1,10 @@
 ﻿using CrowdedPrison.Encryption;
+using CrowdedPrison.Messenger;
 using CrowdedPrison.Messenger.Encryption;
 
 namespace CrowdedPrison.Wpf
 {
-  public class AppConfiguration : IGpgConfiguration, IGpgMessengerConfiguration
+  public class AppConfiguration : IGpgConfiguration, IMessengerConfiguration, IGpgMessengerConfiguration
   {
     public string GpgPath { get; }
     public string HomeDir { get; }

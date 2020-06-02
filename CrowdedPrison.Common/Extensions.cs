@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CrowdedPrison.Messenger.Extensions
+namespace CrowdedPrison.Common
 {
   public static class Extensions
   {
@@ -22,6 +20,13 @@ namespace CrowdedPrison.Messenger.Extensions
         : DateTimeOffset.FromUnixTimeSeconds(l);
 
       return dt.DateTime.ToLocalTime();
+    }
+
+    public static int ToInteger(this string s, int @default = default)
+    {
+      return int.TryParse(s, out var i)
+        ? i
+        : @default;
     }
   }
 }

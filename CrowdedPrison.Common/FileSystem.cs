@@ -1,15 +1,35 @@
 ﻿using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CrowdedPrison.Common
 {
   internal class FileSystem : IFileSystem
   {
-    public string GetTempFilePath()
+    public bool FileExists(string path)
+    {
+      return File.Exists(path);
+    }
+
+    public bool DirectoryExists(string path)
+    {
+      return Directory.Exists(path);
+    }
+
+    public async Task DownloadFileAsync(string url, string path)
+    {
+      using var client = new WebClient();
+      await client.DownloadFileTaskAsync(url, path);
+    }
+
+    public string GetTempFilePath(string extension = null)
     {
       var randomName = Path.GetRandomFileName();
       var tempPath = Path.GetTempPath();
-      return Path.Combine(tempPath, randomName);
+      
+      return string.IsNullOrEmpty(extension) 
+        ? Path.Combine(tempPath, randomName)
+        : Path.Combine(tempPath, $"{randomName}.{extension}");
     }
 
     public void DeleteFile(string fileName)

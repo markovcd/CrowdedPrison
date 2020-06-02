@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CrowdedPrison.Common\CrowdedPrison.Common.csproj" />
     <ProjectReference Include="..\fbchat-sharp\fbchat-sharp\fbchat-sharp.csproj" />
   </ItemGroup>
 

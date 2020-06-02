@@ -32,6 +32,7 @@ namespace CrowdedPrison.Wpf
       var appConfig = new AppConfiguration();
       containerRegistry.RegisterInstance(appConfig);
       containerRegistry.RegisterInstance<IGpgConfiguration>(appConfig);
+      containerRegistry.RegisterInstance<IMessengerConfiguration>(appConfig);
       containerRegistry.RegisterInstance<IGpgMessengerConfiguration>(appConfig);
 
       containerRegistry.RegisterForNavigation<MainView>();

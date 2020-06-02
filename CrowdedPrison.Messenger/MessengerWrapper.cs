@@ -9,17 +9,18 @@ using CrowdedPrison.Messenger.Events;
 using System.Net;
 using Newtonsoft.Json;
 using System.IO;
-using CrowdedPrison.Messenger.Extensions;
+using CrowdedPrison.Common;
 
 namespace CrowdedPrison.Messenger
 {
   internal class MessengerWrapper : IMessenger
   {
-    private const string appName = "FBChat-Sharp";
-    private const string sessionFile = "SESSION_COOKIES_core.dat";
-
+    private const string sessionFileName = "cookies.dat";
+    private readonly IMessengerConfiguration configuration;
     private readonly BaseClient messenger;
     private Session session;
+
+    private string SessionFilePath => Path.Combine(configuration.HomeDir, sessionFileName);
 
     public event AsyncEventHandler<TwoFactorEventArgs> TwoFactorRequested;
     public event AsyncEventHandler<UserLoginEventArgs> UserLoginRequested;
@@ -32,19 +33,10 @@ namespace CrowdedPrison.Messenger
     public IReadOnlyDictionary<string, MessengerUser> Users { get; private set; }
     public MessengerUser Self { get; private set; }
 
-    public string UserDataFolder
+    public MessengerWrapper(IMessengerConfiguration configuration)
     {
-      get
-      {
-        string folderBase = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        string dir = Path.Combine(folderBase, appName.ToUpper());
-        Directory.CreateDirectory(dir);
-        return dir;
-      }
-    }
+      this.configuration = configuration;
 
-    public MessengerWrapper()
-    {
       messenger = new BaseClient
       {
         On2FACodeCallback = OnTwoFactorRequestedAsync,
@@ -249,9 +241,7 @@ namespace CrowdedPrison.Messenger
 
     private async Task OnWriteCookiesToDiskCallback(Dictionary<string, List<Cookie>> cookieJar)
     {
-      var file = Path.Combine(UserDataFolder, sessionFile);
-
-      await using var fileStream = File.Create(file);
+      await using var fileStream = File.Create(SessionFilePath);
       try
       {
         using var jsonWriter = new JsonTextWriter(new StreamWriter(fileStream));
@@ -269,8 +259,7 @@ namespace CrowdedPrison.Messenger
     {
       try
       {
-        var file = Path.Combine(UserDataFolder, sessionFile);
-        await using var fileStream = File.OpenRead(file);
+        await using var fileStream = File.OpenRead(SessionFilePath);
         using var jsonTextReader = new JsonTextReader(new StreamReader(fileStream));
         var serializer = new JsonSerializer();
         return serializer.Deserialize<Dictionary<string, List<Cookie>>>(jsonTextReader);
@@ -286,8 +275,7 @@ namespace CrowdedPrison.Messenger
       try
       {
         await Task.Yield();
-        var file = Path.Combine(UserDataFolder, sessionFile);
-        File.Delete(file);
+        File.Delete(SessionFilePath);
       }
       catch
       {

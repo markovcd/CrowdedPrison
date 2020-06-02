@@ -18,7 +18,7 @@ namespace CrowdedPrison.Common
     string ErrorText { get; }
     string OutputText { get; }
     Task WaitForExitAsync();
-    bool Start(string fileName, string arguments = default);
+    bool Start(string fileName, string arguments = default, bool elevated = false);
     Task WriteToInputAsync(string command);
     void Kill();
   }

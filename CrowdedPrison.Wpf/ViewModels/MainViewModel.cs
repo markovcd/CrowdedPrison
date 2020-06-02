@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CrowdedPrison.Messenger.Encryption.Events;
+using CrowdedPrison.Encryption;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
@@ -17,15 +18,18 @@ namespace CrowdedPrison.Wpf.ViewModels
     private readonly IGpgMessenger gpgMessenger;
     private readonly ILoginDialogService dialogService;
     private readonly AppConfiguration configuration;
+    private readonly IGpgDownloader downloader;
 
     public ICommand ConnectCommand { get; }
 
-    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, ILoginDialogService dialogService, AppConfiguration configuration)
+    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, ILoginDialogService dialogService,
+      AppConfiguration configuration, IGpgDownloader downloader)
     {
       this.messenger = messenger;
       this.gpgMessenger = gpgMessenger;
       this.dialogService = dialogService;
       this.configuration = configuration;
+      this.downloader = downloader;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
@@ -46,11 +50,14 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private async Task ConnectAsync()
     {
-      await messenger.LoginAsync();
+      //await messenger.LoginAsync();
       //var threads = await messenger.GetThreadsAsync();
       //var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
       //var m = await messenger.GetMessagesAsync(thread.Id, 100);
-      var b = await gpgMessenger.ImportPublicKeyAsync(messenger.Self);
+      //var b = await gpgMessenger.ImportPublicKeyAsync(messenger.Self);
+      var d = DateTime.Now;
+      var a = await downloader.EnsureGpgExistsAsync();
+      Debug.WriteLine(DateTime.Now - d);
     }
 
 

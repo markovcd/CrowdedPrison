@@ -1,95 +1,11 @@
-﻿using System;
+﻿using CrowdedPrison.Common;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 namespace CrowdedPrison.Encryption
 {
-  public enum FieldType
-  {
-    Unknown,
-    PublicKey,
-    Subkey,
-    SecretKey,
-    SecretSubKey,
-    UserId,
-    Fingerprint,
-    Keygrip,
-  }
-
-  [Flags]
-  public enum KeyValidity
-  {
-    None = 0,
-    Unknown = 1 << 0,
-    Invalid = 1 << 1,
-    Disabled = 1 << 2,
-    Revoked = 1 << 3,
-    Expired = 1 << 4,
-    UnknownValidity = 1 << 5,
-    UndefinedValidity = 1 << 6,
-    NotValid = 1 << 7,
-    MarginalValid = 1 << 8,
-    FullyValid = 1 << 9,
-    UltimatelyValid = 1 << 10,
-    PrivatePart = 1 << 11,
-    SpecialValidity = 1 << 12
-  }
-
-  [Flags]
-  public enum KeyCababilities
-  {
-    None = 0,
-    Encrypt = 1 << 0,
-    Sign = 1 << 1,
-    Certify = 1 << 2,
-    Authentication = 1 << 3,
-    UnknownCapability = 1 << 4,
-    DisabledKey = 1 << 5,
-    WholeKeyEncrypt = 1 << 6,
-    WholeKeySign = 1 << 7,
-    WholeKeyCertify = 1 << 8,
-    WholeKeyAuthentication = 1 << 9,
-  }
-
-  public enum PublicKeyAlgorithm
-  {
-    Unknown,
-    Rsa,
-    RsaEncryptOnly,
-    RsaSignOnly,    
-  }
-
-  public class KeyListField
-  {
-    public FieldType Type { get; set; }
-    public KeyValidity Validity { get; set; }
-    public int KeyLength { get; set; }
-    public PublicKeyAlgorithm Algorithm { get; set; }
-    public string KeyId { get; set; }
-    public DateTime CreationDate { get; set; }
-    public DateTime ExpirationDate { get; set; }
-    public string UserIdHash { get; set; }
-    public string UserId { get; set; }
-    public KeyCababilities Cababilities { get; set; }
-  }
-
-  public class GpgKey
-  {
-    public bool IsSecret { get; set; }
-    public string Fingerprint { get; set; }
-    public string Keygrip { get; set; }
-    public DateTime CreationDate { get; set; }
-    public DateTime ExpirationDate { get; set; }
-    public string UserIdHash { get; set; }
-    public string UserId { get; set; }
-    public KeyCababilities Cababilities { get; set; }
-    public PublicKeyAlgorithm Algorithm { get; set; }
-    public KeyValidity Validity { get; set; }
-    public int Length { get; set; }
-    public string Id { get; set; }
-  }
-
   internal class KeyListParser
   {
     public static IReadOnlyList<GpgKey> GpgKeysFromFields(IEnumerable<IEnumerable<KeyListField>> fields)
@@ -176,11 +92,11 @@ namespace CrowdedPrison.Encryption
       {
         Type = GetFieldType(GetItem(f, 0)),
         Validity = GetValidity(GetItem(f, 1)),
-        KeyLength = GetKeyLength(GetItem(f, 2)),
-        Algorithm = GetAlgorithm(GetItem(f, 3)),
+        KeyLength = GetItem(f, 2).ToInteger(),
+        Algorithm = (PublicKeyAlgorithm)GetItem(f, 3).ToInteger(),
         KeyId = GetItem(f, 4),
-        CreationDate = GetDate(GetItem(f, 5)),
-        ExpirationDate = GetDate(GetItem(f, 6)),
+        CreationDate = GetItem(f, 5).FromUnixEpoch(),
+        ExpirationDate = GetItem(f, 6).FromUnixEpoch(),
         UserIdHash = GetItem(f, 7),
         UserId = GetItem(f, 9),
         Cababilities = GetCapabilities(GetItem(f, 11))
@@ -212,37 +128,6 @@ namespace CrowdedPrison.Encryption
       if (s.Contains('A')) result |= KeyCababilities.WholeKeyAuthentication;
 
       return result;
-    }
-
-    private static DateTime GetDate(string s)
-    {
-      var i = ParseLong(s);
-      return DateTimeOffset.FromUnixTimeSeconds(i).DateTime;
-    }
-
-    private static PublicKeyAlgorithm GetAlgorithm(string s)
-    {
-      var i = ParseInteger(s);
-      return (PublicKeyAlgorithm)i;
-    }
-
-    private static int GetKeyLength(string s)
-    {
-      return ParseInteger(s);
-    }
-
-    private static int ParseInteger(string s, int @default = default)
-    {
-      return int.TryParse(s, out var i) 
-        ? i 
-        : @default;
-    }
-
-    private static long ParseLong(string s, long @default = default)
-    {
-      return long.TryParse(s, out var i) 
-        ? i 
-        : @default;
     }
 
     private static KeyValidity GetValidity(string s)

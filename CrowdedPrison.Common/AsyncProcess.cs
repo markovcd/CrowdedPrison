@@ -19,17 +19,21 @@ namespace CrowdedPrison.Common
     public string OutputText => AggregateData();
 
 
-    public bool Start(string fileName, string arguments = default)
+    public bool Start(string fileName, string arguments = default, bool elevated = false)
     {
       if (State != ProcessState.NotStarted) 
         throw new InvalidOperationException("Process already started");
 
       tcs = new TaskCompletionSource<object>();
-      var startInfo = CreateStartInfo(fileName, arguments);
+      var startInfo = CreateStartInfo(fileName, arguments, elevated);
       process = CreateProcess(startInfo);
-      var result =  process.Start();
-      process.BeginOutputReadLine();
-      process.BeginErrorReadLine();
+      var result = process.Start();
+      
+      if (!elevated)
+      {
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+      }
 
       State = ProcessState.Started;
       return result;
@@ -73,17 +77,18 @@ namespace CrowdedPrison.Common
       dataList.Add(o);
     }
 
-    private static ProcessStartInfo CreateStartInfo(string fileName, string arguments)
+    private static ProcessStartInfo CreateStartInfo(string fileName, string arguments, bool elevated = false)
     {
       return new ProcessStartInfo
       {
         Arguments = arguments,
         FileName = fileName,
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        RedirectStandardInput = true,
-        CreateNoWindow = false,
-        UseShellExecute = false,
+        RedirectStandardOutput = !elevated,
+        RedirectStandardError = !elevated,
+        RedirectStandardInput = !elevated,
+        CreateNoWindow = true,
+        UseShellExecute = elevated,
+        Verb = elevated ? "runas" : null
       };
     }
 

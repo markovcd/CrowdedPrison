@@ -4,6 +4,5 @@
   {
     string GetPublicKeyBlock(string text);
     string GetMessageBlock(string text);
-
   }
 }
