@@ -4,7 +4,7 @@ using Prism.Commands;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  public class LoginDialogViewModel : BaseDialogViewModel<(string email, string password, bool isCancelled)>
+  public class LoginDialogViewModel : BaseDialogViewModel<(string email, string password)>
   {
     private string email;
 
@@ -25,12 +25,12 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private void Ok(PasswordBox passwordBox)
     {
-      SetResult((Email, passwordBox.Password, false));
+      SetResult((Email, passwordBox.Password));
     }
 
     private void Cancel()
     {
-      SetResult((null, null, true));
+      SetResult((null, null));
     }
   }
 }

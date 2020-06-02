@@ -3,7 +3,7 @@ using Prism.Commands;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  public class TwoFactorDialogViewModel : BaseDialogViewModel<(string code, bool isCancelled)>
+  public class TwoFactorDialogViewModel : BaseDialogViewModel<string>
   {
     private string code;
 
@@ -24,12 +24,12 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private void Ok()
     {
-      SetResult((Code, false));
+      SetResult(Code);
     }
 
     private void Cancel()
     {
-      SetResult((null, true));
+      SetResult(null);
     }
   }
 }

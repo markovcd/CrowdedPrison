@@ -15,21 +15,17 @@ namespace CrowdedPrison.Wpf.ViewModels
   {
     private readonly IMessenger messenger;
     private readonly IGpgMessenger gpgMessenger;
-    private readonly IDialogService dialogService;
-    private readonly Func<LoginDialogViewModel> loginVmFactory;
-    private readonly Func<TwoFactorDialogViewModel> twoFactorVmFactory;
+    private readonly ILoginDialogService dialogService;
+    private readonly AppConfiguration configuration;
 
     public ICommand ConnectCommand { get; }
 
-    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IDialogService dialogService, 
-      Func<LoginDialogViewModel> loginVmFactory, Func<TwoFactorDialogViewModel> twoFactorVmFactory)
+    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, ILoginDialogService dialogService, AppConfiguration configuration)
     {
       this.messenger = messenger;
       this.gpgMessenger = gpgMessenger;
-
       this.dialogService = dialogService;
-      this.loginVmFactory = loginVmFactory;
-      this.twoFactorVmFactory = twoFactorVmFactory;
+      this.configuration = configuration;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
@@ -71,15 +67,14 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private async Task Messenger_UserLoginRequested(object sender, UserLoginEventArgs e)
     {
-      var vm = loginVmFactory();
-      vm.Email = "markovcd@gmail.com";
-      (e.Email, e.Password, e.IsCancelled) = await dialogService.ShowDialogAsync(vm);
+      (e.Email, e.Password) = await dialogService.ShowLoginDialogAsync(configuration.MessengerEmail);
+      e.IsCancelled = e.Email == null;
     }
 
     private async Task Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
     {
-      var vm = twoFactorVmFactory();
-      (e.TwoFactorCode, e.IsCancelled) = await dialogService.ShowDialogAsync(vm);
+      e.TwoFactorCode = await dialogService.ShowTwoFactorDialogAsync();
+      e.IsCancelled = e.TwoFactorCode == null;
     }
 
     private void Messenger_MessagesDelivered(object sender, MessagesDeliveredEventArgs e)

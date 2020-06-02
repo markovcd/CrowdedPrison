@@ -30,11 +30,14 @@ namespace CrowdedPrison.Wpf
       containerRegistry.RegisterSingleton<AppConfiguration>();
 
       var appConfig = new AppConfiguration();
+      containerRegistry.RegisterInstance(appConfig);
       containerRegistry.RegisterInstance<IGpgConfiguration>(appConfig);
       containerRegistry.RegisterInstance<IGpgMessengerConfiguration>(appConfig);
 
       containerRegistry.RegisterForNavigation<MainView>();
       containerRegistry.Register<IDialogService, DialogService>();
+      containerRegistry.Register<ILoginDialogService, LoginDialogService>();
+
       DialogService.Register<LoginDialogViewModel, LoginDialogView>();
       DialogService.Register<TwoFactorDialogViewModel, TwoFactorDialogView>();
     }
