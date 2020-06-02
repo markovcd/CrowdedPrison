@@ -6,7 +6,7 @@ namespace CrowdedPrison.Wpf
 {
   public class AppConfiguration : IGpgConfiguration, IMessengerConfiguration, IGpgMessengerConfiguration
   {
-    public string GpgPath { get; }
+    public string GpgPath { get; set; }
     public string HomeDir { get; }
     public string GpgPassword { get; }
     public string MessengerEmail { get; }

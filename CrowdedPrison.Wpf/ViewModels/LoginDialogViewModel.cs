@@ -4,7 +4,7 @@ using Prism.Commands;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  public class LoginDialogViewModel : BaseDialogViewModel<(string email, string password)>
+  internal class LoginDialogViewModel : BaseDialogViewModel<(string email, string password)>
   {
     private string email;
 

@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CrowdedPrison.Messenger.Encryption.Events;
 using CrowdedPrison.Encryption;
+using Prism.Regions;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  internal class MainViewModel : BindableBase
+  internal class MainViewModel : BindableBase, INavigationAware
   {
     private readonly IMessenger messenger;
     private readonly IGpgMessenger gpgMessenger;
@@ -46,6 +47,16 @@ namespace CrowdedPrison.Wpf.ViewModels
     private void GpgMessenger_EncryptedMessageReceived(object sender, EncryptedMessageReceivedEventArgs e)
     {
       Debug.WriteLine(e.DecryptedText);
+    }
+
+    public async Task DownloadGpgAsync()
+    {
+      configuration.GpgPath = downloader.GetGpgPath();
+      if (configuration.GpgPath == null)
+        configuration.GpgPath = await dialogService.ShowDownloadGpgDialogAsync();
+
+      if (configuration.GpgPath == null)
+        Environment.Exit(1);
     }
 
     private async Task ConnectAsync()
@@ -96,6 +107,20 @@ namespace CrowdedPrison.Wpf.ViewModels
     private void Messenger_ConnectionStateChanged(object sender, ConnectionStateEventArgs e)
     {
       Debug.WriteLine($"{e.State} {e.Reason}");
+    }
+
+    public void OnNavigatedTo(NavigationContext navigationContext)
+    {
+      DownloadGpgAsync();
+    }
+
+    public bool IsNavigationTarget(NavigationContext navigationContext)
+    {
+      return true;
+    }
+
+    public void OnNavigatedFrom(NavigationContext navigationContext)
+    {
     }
   }
 }

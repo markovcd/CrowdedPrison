@@ -3,7 +3,7 @@ using Prism.Commands;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  public class TwoFactorDialogViewModel : BaseDialogViewModel<string>
+  internal class TwoFactorDialogViewModel : BaseDialogViewModel<string>
   {
     private string code;
 

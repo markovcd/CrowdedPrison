@@ -13,6 +13,7 @@ namespace CrowdedPrison.Encryption
     private static string GpgUrl => $"https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-{GpgVersion}_{GpgVersionDate:yyyyMMdd}.exe";
     private readonly IFileSystem fileSystem;
     private readonly Func<IAsyncProcess> processFactory;
+
     public GpgDownloader(IFileSystem fileSystem, Func<IAsyncProcess> processFactory)
     {
       this.fileSystem = fileSystem;

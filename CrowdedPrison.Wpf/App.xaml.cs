@@ -13,6 +13,8 @@ namespace CrowdedPrison.Wpf
 {
   internal partial class App
   {
+    private readonly AppConfiguration appConfig = new AppConfiguration();
+
     protected override Window CreateShell()
     {
       return Container.Resolve<Shell>();
@@ -20,16 +22,14 @@ namespace CrowdedPrison.Wpf
 
     protected override void OnInitialized()
     {
-      Container.Resolve<IRegionManager>().RegisterViewWithRegion(RegionNames.ShellRegion, typeof(MainView));
+      Container.Resolve<IRegionManager>().RequestNavigate(RegionNames.ShellRegion, nameof(MainView));
       base.OnInitialized();
     }
 
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
       containerRegistry.RegisterSingleton<Shell>();
-      containerRegistry.RegisterSingleton<AppConfiguration>();
 
-      var appConfig = new AppConfiguration();
       containerRegistry.RegisterInstance(appConfig);
       containerRegistry.RegisterInstance<IGpgConfiguration>(appConfig);
       containerRegistry.RegisterInstance<IMessengerConfiguration>(appConfig);
@@ -41,6 +41,7 @@ namespace CrowdedPrison.Wpf
 
       DialogService.Register<LoginDialogViewModel, LoginDialogView>();
       DialogService.Register<TwoFactorDialogViewModel, TwoFactorDialogView>();
+      DialogService.Register<DownloadGpgDialogViewModel, DownloadGpgDialogView>();
     }
 
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

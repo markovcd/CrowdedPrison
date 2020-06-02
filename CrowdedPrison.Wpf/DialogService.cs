@@ -6,10 +6,6 @@ using CrowdedPrison.Wpf.ViewModels;
 
 namespace CrowdedPrison.Wpf
 {
-  public interface IDialogService
-  {
-    Task<TResult> ShowDialogAsync<TResult>(BaseDialogViewModel<TResult> viewModel);
-  }
 
   internal class DialogService : IDialogService
   {
