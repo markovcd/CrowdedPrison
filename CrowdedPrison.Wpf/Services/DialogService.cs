@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CrowdedPrison.Wpf.ViewModels;
 
-namespace CrowdedPrison.Wpf
+namespace CrowdedPrison.Wpf.Services
 {
 
   internal class DialogService : IDialogService

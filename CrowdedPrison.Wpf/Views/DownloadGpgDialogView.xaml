@@ -9,11 +9,24 @@
   d:DesignHeight="450"
   d:DesignWidth="800"
   mc:Ignorable="d">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
   <Grid>
     <Button
       Width="100"
       Height="100"
       Command="{Binding DownloadCommand}"
-      Content="Download" />
+      Content="Download"
+      Visibility="{Binding IsDownloading, Converter={StaticResource InverseBoolToVisConverter}}" />
+
+      <ProgressBar
+        IsIndeterminate="True"
+        Style="{StaticResource MaterialDesignCircularProgressBar}"
+        Visibility="{Binding IsDownloading, Converter={StaticResource BooleanToVisibilityConverter}}" />
   </Grid>
 </UserControl>

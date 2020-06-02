@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CrowdedPrison.Wpf.ViewModels;
 
-namespace CrowdedPrison.Wpf
+namespace CrowdedPrison.Wpf.Services
 {
   internal interface IDialogService
   {

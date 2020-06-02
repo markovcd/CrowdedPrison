@@ -8,6 +8,7 @@ using CrowdedPrison.Encryption;
 using CrowdedPrison.Messenger;
 using CrowdedPrison.Messenger.Encryption;
 using CrowdedPrison.Wpf.ViewModels;
+using CrowdedPrison.Wpf.Services;
 
 namespace CrowdedPrison.Wpf
 {
@@ -37,11 +38,13 @@ namespace CrowdedPrison.Wpf
 
       containerRegistry.RegisterForNavigation<MainView>();
       containerRegistry.Register<IDialogService, DialogService>();
-      containerRegistry.Register<ILoginDialogService, LoginDialogService>();
+      containerRegistry.Register<IMainDialogService, MainDialogService>();
+      containerRegistry.Register<IShellService, ShellService>();
 
       DialogService.Register<LoginDialogViewModel, LoginDialogView>();
       DialogService.Register<TwoFactorDialogViewModel, TwoFactorDialogView>();
       DialogService.Register<DownloadGpgDialogViewModel, DownloadGpgDialogView>();
+      DialogService.Register<MessageDialogViewModel, MessageDialogView>();
     }
 
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

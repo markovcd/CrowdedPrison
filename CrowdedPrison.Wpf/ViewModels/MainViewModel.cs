@@ -10,6 +10,7 @@ using System.Windows.Input;
 using CrowdedPrison.Messenger.Encryption.Events;
 using CrowdedPrison.Encryption;
 using Prism.Regions;
+using CrowdedPrison.Wpf.Services;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
@@ -17,20 +18,22 @@ namespace CrowdedPrison.Wpf.ViewModels
   {
     private readonly IMessenger messenger;
     private readonly IGpgMessenger gpgMessenger;
-    private readonly ILoginDialogService dialogService;
+    private readonly IMainDialogService dialogService;
     private readonly AppConfiguration configuration;
     private readonly IGpgDownloader downloader;
+    private readonly IShellService shellService;
 
     public ICommand ConnectCommand { get; }
 
-    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, ILoginDialogService dialogService,
-      AppConfiguration configuration, IGpgDownloader downloader)
+    public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IMainDialogService dialogService,
+      AppConfiguration configuration, IGpgDownloader downloader, IShellService shellService)
     {
       this.messenger = messenger;
       this.gpgMessenger = gpgMessenger;
       this.dialogService = dialogService;
       this.configuration = configuration;
       this.downloader = downloader;
+      this.shellService = shellService;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
@@ -56,19 +59,16 @@ namespace CrowdedPrison.Wpf.ViewModels
         configuration.GpgPath = await dialogService.ShowDownloadGpgDialogAsync();
 
       if (configuration.GpgPath == null)
-        Environment.Exit(1);
+      {
+        await dialogService.ShowMessageDialogAsync("Error during GnuPG installation. Application will be closed.");
+        shellService.Close();
+      }
     }
 
     private async Task ConnectAsync()
     {
-      //await messenger.LoginAsync();
-      //var threads = await messenger.GetThreadsAsync();
-      //var thread = threads.FirstOrDefault(t => t.Name.Contains("Chrup"));
-      //var m = await messenger.GetMessagesAsync(thread.Id, 100);
-      //var b = await gpgMessenger.ImportPublicKeyAsync(messenger.Self);
-      var d = DateTime.Now;
-      var a = await downloader.EnsureGpgExistsAsync();
-      Debug.WriteLine(DateTime.Now - d);
+      await messenger.LoginAsync();
+     
     }
 
 
@@ -109,7 +109,7 @@ namespace CrowdedPrison.Wpf.ViewModels
       Debug.WriteLine($"{e.State} {e.Reason}");
     }
 
-    public void OnNavigatedTo(NavigationContext navigationContext)
+    public async void OnNavigatedTo(NavigationContext navigationContext)
     {
       DownloadGpgAsync();
     }

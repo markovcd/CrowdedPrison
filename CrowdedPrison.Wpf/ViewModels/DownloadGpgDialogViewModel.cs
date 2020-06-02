@@ -1,6 +1,7 @@
 ﻿using CrowdedPrison.Encryption;
 using Prism.Commands;
 using System;
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace CrowdedPrison.Wpf.ViewModels
@@ -32,8 +33,16 @@ namespace CrowdedPrison.Wpf.ViewModels
       {
         var path = await downloader.EnsureGpgExistsAsync();
         SetResult(path);
-      }
+      }     
       catch (TimeoutException)
+      {
+        SetResult(null);
+      }
+      catch (OperationCanceledException)
+      {
+        SetResult(null);
+      }
+      catch (Win32Exception)
       {
         SetResult(null);
       }
