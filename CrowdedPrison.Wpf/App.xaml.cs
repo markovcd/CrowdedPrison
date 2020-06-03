@@ -7,8 +7,11 @@ using CrowdedPrison.Common;
 using CrowdedPrison.Encryption;
 using CrowdedPrison.Messenger;
 using CrowdedPrison.Messenger.Encryption;
-using CrowdedPrison.Wpf.ViewModels;
+using CrowdedPrison.Core.ViewModels;
 using CrowdedPrison.Wpf.Services;
+using CrowdedPrison.Core.Services;
+using CrowdedPrison.Core;
+using System.Diagnostics;
 
 namespace CrowdedPrison.Wpf
 {
@@ -36,9 +39,8 @@ namespace CrowdedPrison.Wpf
       containerRegistry.RegisterInstance<IMessengerConfiguration>(appConfig);
       containerRegistry.RegisterInstance<IGpgMessengerConfiguration>(appConfig);
 
-      containerRegistry.RegisterForNavigation<MainView>();
+      containerRegistry.RegisterForNavigation<MainView, MainViewModel>();
       containerRegistry.Register<IDialogService, DialogService>();
-      containerRegistry.Register<IMainDialogService, MainDialogService>();
       containerRegistry.Register<IShellService, ShellService>();
 
       DialogService.Register<LoginDialogViewModel, LoginDialogView>();
@@ -55,6 +57,7 @@ namespace CrowdedPrison.Wpf
       moduleCatalog.AddModule<EncryptionModule>();
       moduleCatalog.AddModule<MessengerModule>();
       moduleCatalog.AddModule<MessengerEncryptionModule>();
+      moduleCatalog.AddModule<CoreModule>();
     }
   }
 }

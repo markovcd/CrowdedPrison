@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Input;
 
-namespace CrowdedPrison.Wpf.ViewModels
+namespace CrowdedPrison.Core.ViewModels
 {
   [Flags]
   public enum Buttons
@@ -14,7 +14,7 @@ namespace CrowdedPrison.Wpf.ViewModels
     No = 1 << 3
   }
 
-  internal class MessageDialogViewModel : BaseDialogViewModel<Buttons>
+  public class MessageDialogViewModel : BaseDialogViewModel<Buttons>
   {
     private string message;
     private Buttons buttons;

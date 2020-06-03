@@ -4,9 +4,9 @@ using System;
 using System.ComponentModel;
 using System.Windows.Input;
 
-namespace CrowdedPrison.Wpf.ViewModels
+namespace CrowdedPrison.Core.ViewModels
 {
-  internal class DownloadGpgDialogViewModel : BaseDialogViewModel<string>
+  public class DownloadGpgDialogViewModel : BaseDialogViewModel<string>
   {
     private readonly IGpgDownloader downloader;
     private bool isDownloading;

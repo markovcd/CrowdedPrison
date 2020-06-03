@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CrowdedPrison.Wpf.ViewModels;
+using CrowdedPrison.Core.ViewModels;
 
-namespace CrowdedPrison.Wpf.Services
+namespace CrowdedPrison.Core.Services
 {
   internal class MainDialogService : IMainDialogService
   {

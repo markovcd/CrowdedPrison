@@ -1,4 +1,4 @@
-﻿namespace CrowdedPrison.Wpf
+﻿namespace CrowdedPrison.Core
 {
   public static class GlobalConstants
   {

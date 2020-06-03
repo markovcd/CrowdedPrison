@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrowdedPrison.Core.Services;
+using System;
 using System.ComponentModel;
 
 namespace CrowdedPrison.Wpf.Services

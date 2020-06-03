@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace CrowdedPrison.Wpf.Services
+namespace CrowdedPrison.Core.Services
 {
-  internal interface IShellService
+  public interface IShellService
   {
     event EventHandler<CancelEventArgs> Cloing;
     void Close();

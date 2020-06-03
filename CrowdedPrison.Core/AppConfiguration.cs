@@ -3,7 +3,7 @@ using CrowdedPrison.Messenger;
 using CrowdedPrison.Messenger.Encryption;
 using Newtonsoft.Json;
 
-namespace CrowdedPrison.Wpf
+namespace CrowdedPrison.Core
 {
   public class AppConfiguration : IGpgConfiguration, IMessengerConfiguration, IGpgMessengerConfiguration
   {

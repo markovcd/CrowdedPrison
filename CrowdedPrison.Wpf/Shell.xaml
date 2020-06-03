@@ -2,8 +2,8 @@
   x:Class="CrowdedPrison.Wpf.Shell"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:core="clr-namespace:CrowdedPrison.Core;assembly=CrowdedPrison.Core"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:local="clr-namespace:CrowdedPrison.Wpf"
   xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:p="http://prismlibrary.com/"
@@ -21,7 +21,7 @@
     <materialDesign:DialogHost.DialogContent>
       <ContentControl x:Name="DialogContent" />
     </materialDesign:DialogHost.DialogContent>
-    <ContentControl p:RegionManager.RegionName="{x:Static local:GlobalConstants.ShellRegionName}" />
+    <ContentControl p:RegionManager.RegionName="{x:Static core:GlobalConstants.ShellRegionName}" />
   </materialDesign:DialogHost>
 
 

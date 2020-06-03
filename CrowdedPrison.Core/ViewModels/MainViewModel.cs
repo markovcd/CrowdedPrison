@@ -10,12 +10,12 @@ using System.Windows.Input;
 using CrowdedPrison.Messenger.Encryption.Events;
 using CrowdedPrison.Encryption;
 using Prism.Regions;
-using CrowdedPrison.Wpf.Services;
+using CrowdedPrison.Core.Services;
 using CrowdedPrison.Common;
 
-namespace CrowdedPrison.Wpf.ViewModels
+namespace CrowdedPrison.Core.ViewModels
 {
-  internal class MainViewModel : BindableBase, INavigationAware
+  public class MainViewModel : BindableBase, INavigationAware
   {
     private readonly IMessenger messenger;
     private readonly IGpgMessenger gpgMessenger;

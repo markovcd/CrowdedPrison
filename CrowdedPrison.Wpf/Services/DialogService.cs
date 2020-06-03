@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using CrowdedPrison.Wpf.ViewModels;
+using CrowdedPrison.Core.Services;
+using CrowdedPrison.Core.ViewModels;
 
 namespace CrowdedPrison.Wpf.Services
 {

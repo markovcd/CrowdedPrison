@@ -2,9 +2,9 @@
 using System.Windows.Input;
 using Prism.Commands;
 
-namespace CrowdedPrison.Wpf.ViewModels
+namespace CrowdedPrison.Core.ViewModels
 {
-  internal class PasswordDialogViewModel : BaseDialogViewModel<string>
+  public class PasswordDialogViewModel : BaseDialogViewModel<string>
   {
     private string message;
 

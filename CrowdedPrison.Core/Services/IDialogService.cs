@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using CrowdedPrison.Wpf.ViewModels;
+using CrowdedPrison.Core.ViewModels;
 
-namespace CrowdedPrison.Wpf.Services
+namespace CrowdedPrison.Core.Services
 {
-  internal interface IDialogService
+  public interface IDialogService
   {
     Task<TResult> ShowDialogAsync<TResult>(BaseDialogViewModel<TResult> viewModel);
   }

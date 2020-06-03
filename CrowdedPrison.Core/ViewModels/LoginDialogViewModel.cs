@@ -2,9 +2,9 @@
 using System.Windows.Input;
 using Prism.Commands;
 
-namespace CrowdedPrison.Wpf.ViewModels
+namespace CrowdedPrison.Core.ViewModels
 {
-  internal class LoginDialogViewModel : BaseDialogViewModel<(string email, string password)>
+  public class LoginDialogViewModel : BaseDialogViewModel<(string email, string password)>
   {
     private string email;
 

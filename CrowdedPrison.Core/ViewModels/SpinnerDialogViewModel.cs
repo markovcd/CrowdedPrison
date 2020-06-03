@@ -1,6 +1,6 @@
-﻿namespace CrowdedPrison.Wpf.ViewModels
+﻿namespace CrowdedPrison.Core.ViewModels
 {
-  internal class SpinnerDialogViewModel : BaseDialogViewModel<object>
+  public class SpinnerDialogViewModel : BaseDialogViewModel<object>
   {
     private string message;
 
