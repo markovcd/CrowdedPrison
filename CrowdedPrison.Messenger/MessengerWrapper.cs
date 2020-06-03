@@ -155,7 +155,7 @@ namespace CrowdedPrison.Messenger
       return GetUser(message.AuthorId);
     }
 
-    public async Task<IReadOnlyList<MessengerUser>> GetUsers(IEnumerable<MessengerThread> threads)
+    public async Task<IReadOnlyList<MessengerUser>> GetUsersAsync(IEnumerable<MessengerThread> threads)
     {
       var threads2 = threads.Select(t => new FB_Thread(t.Id, session)).ToList();
       var users = await messenger.fetchAllUsersFromThreads(threads2);

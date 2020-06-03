@@ -40,7 +40,7 @@ namespace CrowdedPrison.Messenger
     Task<IReadOnlyList<MessengerMessage>> SearchThreadAsync(MessengerUser user, string query, int limit = 5);
     Task<IReadOnlyList<MessengerThread>> SearchThreadsAsync(string name, int limit = 1);
     Task<IReadOnlyList<MessengerUser>> SearchUsersAsync(string name, int limit = 10);
-    Task<IReadOnlyList<MessengerUser>> GetUsers(IEnumerable<MessengerThread> threads);
+    Task<IReadOnlyList<MessengerUser>> GetUsersAsync(IEnumerable<MessengerThread> threads);
     MessengerUser GetUser(MessengerMessage message);
     Task<IReadOnlyList<string>> GetUnreadThreadIds();
   }

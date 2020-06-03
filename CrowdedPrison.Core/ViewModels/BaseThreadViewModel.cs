@@ -3,10 +3,19 @@ using CrowdedPrison.Messenger.Encryption;
 using CrowdedPrison.Messenger.Entities;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace CrowdedPrison.Core.ViewModels
 {
-  public abstract class BaseThreadViewModel<T> : BindableBase
+  public interface IThreadViewModel<out T>
+        where T : MessengerThread
+  {
+    T Metadata { get; }
+    ObservableCollection<MessengerMessage> Messages { get; }
+    ObservableCollection<MessengerUser> Users { get; }
+  }
+
+  public abstract class BaseThreadViewModel<T> : BindableBase, IThreadViewModel<T>
     where T : MessengerThread
   {
     private T metadata;
@@ -27,6 +36,21 @@ namespace CrowdedPrison.Core.ViewModels
     {
       this.gpgMessenger = gpgMessenger;
       this.messenger = messenger;
+      
+    }
+
+    public async Task RefreshMessagesAsync(int limit = 20)
+    {
+      var messages = await messenger.GetMessagesAsync(Metadata, limit);
+      Messages.Clear();
+      Messages.AddRange(messages);
+    }
+
+    public async Task RefreshUsersAsync()
+    {
+      var users = await messenger.GetUsersAsync(new[] { Metadata });
+      Users.Clear();
+      Users.AddRange(users);
     }
   }
 }
