@@ -75,7 +75,7 @@ namespace CrowdedPrison.Messenger.Encryption
     public async Task<string> GetPublicKeyAsync(MessengerUser user)
     {
       const string pattern = "-----BEGIN PGP PUBLIC KEY BLOCK----- -----END PGP PUBLIC KEY BLOCK-----";
-      var messages = await messenger.SearchThread(user, pattern, 50);
+      var messages = await messenger.SearchThreadAsync(user, pattern, 50);
       
       return messages
         .OrderByDescending(m => m.Timestamp)

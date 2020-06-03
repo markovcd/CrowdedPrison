@@ -11,7 +11,6 @@ using CrowdedPrison.Core.ViewModels;
 using CrowdedPrison.Wpf.Services;
 using CrowdedPrison.Core.Services;
 using CrowdedPrison.Core;
-using System.Diagnostics;
 
 namespace CrowdedPrison.Wpf
 {

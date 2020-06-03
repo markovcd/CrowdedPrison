@@ -99,7 +99,7 @@ namespace CrowdedPrison.Messenger
       return await SendTextAsync(user.Id, message);
     }
 
-    public async Task<IReadOnlyList<MessengerMessage>> SearchThread(string threadId, string query, int limit = 5)
+    public async Task<IReadOnlyList<MessengerMessage>> SearchThreadAsync(string threadId, string query, int limit = 5)
     {
       var thread = new FB_Thread(threadId, session);
       var m = await thread.searchMessages(query, offset: 0, limit);
@@ -107,14 +107,28 @@ namespace CrowdedPrison.Messenger
       return m2.Select(s => new MessengerMessage(s)).ToImmutableList();
     }
 
-    public async Task<IReadOnlyList<MessengerMessage>> SearchThread(MessengerThread thread, string query, int limit = 5)
+    public async Task<IReadOnlyList<MessengerMessage>> SearchThreadAsync(MessengerThread thread, string query, int limit = 5)
     {
-      return await SearchThread(thread.Id, query, limit);
+      return await SearchThreadAsync(thread.Id, query, limit);
     }
 
-    public async Task<IReadOnlyList<MessengerMessage>> SearchThread(MessengerUser user, string query, int limit = 5)
+    public async Task<IReadOnlyList<MessengerMessage>> SearchThreadAsync(MessengerUser user, string query, int limit = 5)
     {
-      return await SearchThread(user.Id, query, limit);
+      return await SearchThreadAsync(user.Id, query, limit);
+    }
+
+    public async Task<IReadOnlyList<MessengerThread>> SearchThreadsAsync(string name, int limit = 1)
+    {
+      var threads = await messenger.searchThreads(name, limit);
+      var threads2 = threads?.Select(t => new MessengerThread(t)).ToImmutableList();
+      return threads2;
+    }
+
+    public async Task<IReadOnlyList<MessengerUser>> SearchUsersAsync(string name, int limit = 10)
+    {
+      var users = await messenger.searchUsers(name, limit);
+      var users2 = users?.Select(u => new MessengerUser(u)).ToImmutableList();
+      return users2;
     }
 
     public async Task LogoutAsync()
