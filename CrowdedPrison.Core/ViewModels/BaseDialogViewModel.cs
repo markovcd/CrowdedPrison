@@ -3,7 +3,7 @@ using Prism.Mvvm;
 
 namespace CrowdedPrison.Core.ViewModels
 {
-  public class BaseDialogViewModel<TResult> : BindableBase
+  public abstract class BaseDialogViewModel<TResult> : BindableBase
   {
     protected virtual void SetResult(TResult result)
     {
