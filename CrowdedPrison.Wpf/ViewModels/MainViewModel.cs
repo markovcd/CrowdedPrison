@@ -56,6 +56,24 @@ namespace CrowdedPrison.Wpf.ViewModels
       shellService.Cloing += ShellService_Cloing;
     }
 
+    private async void Init()
+    {
+      await LoadSettingsAsync();
+      if (await CheckGpgPasswordAsync() && await DownloadGpgAsync())
+      {
+        if (await ConnectAsync())
+        {
+          if (!await gpgMessenger.IsPrivateKeyPresentAsync())
+          {
+            if (!await gpgMessenger.GeneratePrivateKeyAsync())
+            {
+              await dialogService.ShowMessageDialogAsync("Failed to generate private key. Application will be closed.");
+              shellService.Close();
+            }
+          }
+        }
+      }
+    }
 
     private async Task SaveSettingsAsync()
     {
@@ -109,9 +127,10 @@ namespace CrowdedPrison.Wpf.ViewModels
       }
     }
 
-    private async Task ConnectAsync()
+    private async Task<bool> ConnectAsync()
     {
       bool success;
+      var cancelled = false;
 
       try
       {
@@ -120,7 +139,8 @@ namespace CrowdedPrison.Wpf.ViewModels
       }
       catch (OperationCanceledException)
       {
-        success = true;
+        cancelled = true;
+        success = false;
       }
      
       finally
@@ -128,7 +148,9 @@ namespace CrowdedPrison.Wpf.ViewModels
         await HideSpinnerAsync();
       }
 
-      if (!success) await dialogService.ShowMessageDialogAsync("Login to Facebook failed. Make sure you entered correct password or two factor code.");
+      if (!success && !cancelled) await dialogService.ShowMessageDialogAsync("Login to Facebook failed. Make sure you entered correct password or two factor code.");
+
+      return success;    
     }
 
     private void ShowSpinner()
@@ -208,8 +230,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     public async void OnNavigatedTo(NavigationContext navigationContext)
     {
-      await LoadSettingsAsync();
-      if (await CheckGpgPasswordAsync() && await DownloadGpgAsync()) await ConnectAsync();
+      Init();
     }
 
     public bool IsNavigationTarget(NavigationContext navigationContext)

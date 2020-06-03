@@ -1,16 +1,21 @@
 ﻿using CrowdedPrison.Common;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 namespace CrowdedPrison.Encryption
 {
-  internal class KeyListParser
+  internal class KeyListParser : IKeyListParser
   {
-    public static IReadOnlyList<GpgKey> GpgKeysFromFields(IEnumerable<IEnumerable<KeyListField>> fields)
+    public IReadOnlyList<GpgKey> GpgKeysFromFields(IEnumerable<IEnumerable<KeyListField>> fields)
     {
       return fields.Select(GpgKeyFromFields).ToImmutableList();
+    }
+
+    public IReadOnlyList<GpgKey> GpgKeysFromData(IReadOnlyList<IReadOnlyList<string>> l)
+    {
+      var fields = ParseFields(l);
+      return GpgKeysFromFields(fields);
     }
 
     public static GpgKey GpgKeyFromFields(IEnumerable<KeyListField> fields)

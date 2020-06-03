@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 using CrowdedPrison.Encryption;
 using CrowdedPrison.Messenger.Encryption.Events;
@@ -15,25 +15,32 @@ namespace CrowdedPrison.Messenger.Encryption
     private readonly IMessenger messenger;
     private readonly IGpgMessengerConfiguration configuration;
     private readonly ITwoWayEncryption encryption;
-
+    private readonly IKeyListParser keyListParser;
     public event EventHandler<EncryptedMessageReceivedEventArgs> EncryptedMessageReceived;
 
 
     public GpgMessenger(IGpg gpg, IPgpRegexHelper pgpHelper, IMessenger messenger, IGpgMessengerConfiguration configuration,
-      ITwoWayEncryption encryption)
+      ITwoWayEncryption encryption, IKeyListParser keyListParser)
     { 
       this.gpg = gpg;
       this.pgpHelper = pgpHelper;
       this.messenger = messenger;
       this.configuration = configuration;
       this.encryption = encryption;
+      this.keyListParser = keyListParser;
 
       messenger.MessageReceived += Messenger_MessageReceived;
     }
 
-    public async Task<bool> GeneratePrivateKey()
+    public async Task<bool> GeneratePrivateKeyAsync()
     {
       return await gpg.GenerateKeyAsync(messenger.Self.Id, GetGpgPassword());
+    }
+
+    public async Task<bool> IsPrivateKeyPresentAsync()
+    {
+      var key = await GetPrivateKeyAsync();
+      return key != null;  
     }
 
     private string GetGpgPassword()
@@ -88,6 +95,18 @@ namespace CrowdedPrison.Messenger.Encryption
     {
       var args = new EncryptedMessageReceivedEventArgs(decrypted, user, message, replyTo);
       EncryptedMessageReceived?.Invoke(this, args);
+    }
+
+    private async Task<IReadOnlyList<GpgKey>> GetKeysAsync(bool secret = false)
+    {
+      var data = await gpg.ListKeysAsync(secret);
+      return keyListParser.GpgKeysFromData(data);
+    }
+
+    private async Task<GpgKey> GetPrivateKeyAsync()
+    {
+      var keys = await GetKeysAsync(true);
+      return keys.FirstOrDefault(k => k.UserId == messenger.Self.Id);
     }
   }
 }

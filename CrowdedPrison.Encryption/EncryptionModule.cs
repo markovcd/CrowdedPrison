@@ -16,6 +16,8 @@ namespace CrowdedPrison.Encryption
       containerRegistry.RegisterSingleton<IPgpRegexHelper, PgpRegexHelper>();
       containerRegistry.RegisterSingleton<IGpgDownloader, GpgDownloader>();
       containerRegistry.RegisterSingleton<ITwoWayEncryption, TwoWayEncryption>();
+      containerRegistry.RegisterSingleton<IKeyListParser, KeyListParser>();
+
     }
   }
 }
