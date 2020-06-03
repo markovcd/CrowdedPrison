@@ -2,6 +2,6 @@
 {
   public interface IGpgMessengerConfiguration
   {
-    string GpgPassword { get; }
+    string GpgPasswordHash { get; }
   }
 }

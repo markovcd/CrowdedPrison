@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CrowdedPrison.Messenger.Entities;
 using CrowdedPrison.Messenger.Events;
 using System.Net;
-using Newtonsoft.Json;
 using System.IO;
 using CrowdedPrison.Common;
 
@@ -17,10 +16,18 @@ namespace CrowdedPrison.Messenger
   {
     private const string sessionFileName = "cookies.dat";
     private readonly IMessengerConfiguration configuration;
+    private readonly IFileSerializer serializer;
     private readonly BaseClient messenger;
     private Session session;
 
-    private string SessionFilePath => Path.Combine(configuration.HomeDir, sessionFileName);
+    private string SessionFilePath 
+    {
+      get
+      {
+        Directory.CreateDirectory(configuration.HomeDir);
+        return Path.Combine(configuration.HomeDir, sessionFileName);
+      }
+    }
 
     public event AsyncEventHandler<TwoFactorEventArgs> TwoFactorRequested;
     public event AsyncEventHandler<UserLoginEventArgs> UserLoginRequested;
@@ -33,9 +40,10 @@ namespace CrowdedPrison.Messenger
     public IReadOnlyDictionary<string, MessengerUser> Users { get; private set; }
     public MessengerUser Self { get; private set; }
 
-    public MessengerWrapper(IMessengerConfiguration configuration)
+    public MessengerWrapper(IMessengerConfiguration configuration, IFileSerializer serializer)
     {
       this.configuration = configuration;
+      this.serializer = serializer;
 
       messenger = new BaseClient
       {
@@ -240,33 +248,12 @@ namespace CrowdedPrison.Messenger
 
     private async Task OnWriteCookiesToDiskCallback(Dictionary<string, List<Cookie>> cookieJar)
     {
-      await using var fileStream = File.Create(SessionFilePath);
-      try
-      {
-        using var jsonWriter = new JsonTextWriter(new StreamWriter(fileStream));
-        var serializer = new JsonSerializer();
-        serializer.Serialize(jsonWriter, cookieJar);
-        await jsonWriter.FlushAsync();
-      }
-      catch
-      {
-
-      }
+      await serializer.SerializeAsync(cookieJar, SessionFilePath);
     }
 
     private async Task<Dictionary<string, List<Cookie>>> OnReadCookiesFromDiskCallback()
     {
-      try
-      {
-        await using var fileStream = File.OpenRead(SessionFilePath);
-        using var jsonTextReader = new JsonTextReader(new StreamReader(fileStream));
-        var serializer = new JsonSerializer();
-        return serializer.Deserialize<Dictionary<string, List<Cookie>>>(jsonTextReader);
-      }
-      catch
-      {
-        return null;
-      }
+      return await serializer.DeserializeAsync<Dictionary<string, List<Cookie>>>(SessionFilePath);
     }
 
     private async Task OnDeleteCookiesCallback()

@@ -4,6 +4,8 @@ namespace CrowdedPrison.Common
 {
   public interface IFileSystem
   {
+    string CombinePaths(params string[] paths);
+    string GetHomeDirectoryPath(string subDirectoryName);
     bool FileExists(string path);
     Task DownloadFileAsync(string url, string path);
     bool DirectoryExists(string path);

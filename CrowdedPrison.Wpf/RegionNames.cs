@@ -1,7 +1,8 @@
 ﻿namespace CrowdedPrison.Wpf
 {
-  public static class RegionNames
+  public static class GlobalConstants
   {
-    public const string ShellRegion = "Region.Shell";
+    public const string ShellRegionName = "Region.Shell";
+    public const string AppName = "CrowdedPrison";
   }
 }

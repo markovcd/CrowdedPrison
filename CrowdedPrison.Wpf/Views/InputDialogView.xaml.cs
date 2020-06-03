@@ -1,8 +1,8 @@
 ﻿namespace CrowdedPrison.Wpf.Views
 {
-  internal partial class TwoFactorDialogView
+  internal partial class InputDialogView
   {
-    public TwoFactorDialogView()
+    public InputDialogView()
     {
       InitializeComponent();
     }

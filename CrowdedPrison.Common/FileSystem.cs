@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -6,6 +7,19 @@ namespace CrowdedPrison.Common
 {
   internal class FileSystem : IFileSystem
   {
+    public string CombinePaths(params string[] paths)
+    {
+      return Path.Combine(paths);
+    }
+
+    public string GetHomeDirectoryPath(string subDirectoryName)
+    {
+      string folderBase = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+      string dir = Path.Combine(folderBase, subDirectoryName);
+      Directory.CreateDirectory(dir);
+      return dir;
+    }
+
     public bool FileExists(string path)
     {
       return File.Exists(path);

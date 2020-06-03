@@ -14,6 +14,7 @@ namespace CrowdedPrison.Common
     {
       containerRegistry.RegisterSingleton<IFileSystem, FileSystem>();
       containerRegistry.Register<IAsyncProcess, AsyncProcess>();
+      containerRegistry.Register<IFileSerializer, FileJsonSerializer>();
     }
   }
 }

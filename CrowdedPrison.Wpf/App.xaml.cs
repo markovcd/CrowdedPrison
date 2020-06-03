@@ -23,7 +23,7 @@ namespace CrowdedPrison.Wpf
 
     protected override void OnInitialized()
     {
-      Container.Resolve<IRegionManager>().RequestNavigate(RegionNames.ShellRegion, nameof(MainView));
+      Container.Resolve<IRegionManager>().RequestNavigate(GlobalConstants.ShellRegionName, nameof(MainView));
       base.OnInitialized();
     }
 
@@ -42,7 +42,8 @@ namespace CrowdedPrison.Wpf
       containerRegistry.Register<IShellService, ShellService>();
 
       DialogService.Register<LoginDialogViewModel, LoginDialogView>();
-      DialogService.Register<TwoFactorDialogViewModel, TwoFactorDialogView>();
+      DialogService.Register<InputDialogViewModel, InputDialogView>();
+      DialogService.Register<PasswordDialogViewModel, InputPasswordDialogView>();
       DialogService.Register<DownloadGpgDialogViewModel, DownloadGpgDialogView>();
       DialogService.Register<MessageDialogViewModel, MessageDialogView>();
       DialogService.Register<SpinnerDialogViewModel, SpinnerDialogView>();

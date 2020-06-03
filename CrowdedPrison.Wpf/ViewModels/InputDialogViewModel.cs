@@ -3,20 +3,27 @@ using Prism.Commands;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
-  internal class TwoFactorDialogViewModel : BaseDialogViewModel<string>
+  internal class InputDialogViewModel : BaseDialogViewModel<string>
   {
-    private string code;
+    private string value;
+    private string message;
 
     public ICommand OkCommand { get; }
     public ICommand CancelCommand { get; }
 
-    public string Code
+    public string Value
     {
-      get => code;
-      set => SetProperty(ref code, value);
+      get => value;
+      set => base.SetProperty(ref value, value);
     }
 
-    public TwoFactorDialogViewModel()
+    public string Message
+    {
+      get => message;
+      set => SetProperty(ref message, value);
+    }
+
+    public InputDialogViewModel()
     {
       OkCommand = new DelegateCommand(Ok);
       CancelCommand = new DelegateCommand(Cancel);
@@ -24,7 +31,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private void Ok()
     {
-      SetResult(Code);
+      SetResult(Value);
     }
 
     private void Cancel()

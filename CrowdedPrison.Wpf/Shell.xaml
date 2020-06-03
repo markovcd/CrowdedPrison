@@ -21,7 +21,7 @@
     <materialDesign:DialogHost.DialogContent>
       <ContentControl x:Name="DialogContent" />
     </materialDesign:DialogHost.DialogContent>
-    <ContentControl p:RegionManager.RegionName="{x:Static local:RegionNames.ShellRegion}" />
+    <ContentControl p:RegionManager.RegionName="{x:Static local:GlobalConstants.ShellRegionName}" />
   </materialDesign:DialogHost>
 
 

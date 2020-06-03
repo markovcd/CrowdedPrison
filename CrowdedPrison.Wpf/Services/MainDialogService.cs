@@ -8,7 +8,8 @@ namespace CrowdedPrison.Wpf.Services
   {
     private readonly IDialogService dialogService;
     private readonly Func<LoginDialogViewModel> loginVmFactory;
-    private readonly Func<TwoFactorDialogViewModel> twoFactorVmFactory;
+    private readonly Func<InputDialogViewModel> inputVmFactory;
+    private readonly Func<PasswordDialogViewModel> passwordVmFactory;
     private readonly Func<DownloadGpgDialogViewModel> downloadGpgVmFactory;
     private readonly Func<MessageDialogViewModel> messageVmFactory;
     private readonly Func<SpinnerDialogViewModel> spinnerVmFactory;
@@ -17,12 +18,14 @@ namespace CrowdedPrison.Wpf.Services
     private Task spinnerTask;
 
     public MainDialogService(IDialogService dialogService, Func<LoginDialogViewModel> loginVmFactory, 
-      Func<TwoFactorDialogViewModel> twoFactorVmFactory, Func<DownloadGpgDialogViewModel> downloadGpgVmFactory,
-      Func<MessageDialogViewModel> messageVmFactory, Func<SpinnerDialogViewModel> spinnerVmFactory)
+      Func<InputDialogViewModel> inputVmFactory, Func<PasswordDialogViewModel> passwordVmFactory,
+      Func<DownloadGpgDialogViewModel> downloadGpgVmFactory, Func<MessageDialogViewModel> messageVmFactory, 
+      Func<SpinnerDialogViewModel> spinnerVmFactory)
     {
       this.dialogService = dialogService;
       this.loginVmFactory = loginVmFactory;
-      this.twoFactorVmFactory = twoFactorVmFactory;
+      this.inputVmFactory = inputVmFactory;
+      this.passwordVmFactory = passwordVmFactory;
       this.downloadGpgVmFactory = downloadGpgVmFactory;
       this.messageVmFactory = messageVmFactory;
       this.spinnerVmFactory = spinnerVmFactory;
@@ -35,9 +38,17 @@ namespace CrowdedPrison.Wpf.Services
       return await dialogService.ShowDialogAsync(vm);
     }
 
-    public async Task<string> ShowTwoFactorDialogAsync()
+    public async Task<string> ShowInputDialogAsync(string message = null)
     {
-      var vm = twoFactorVmFactory();
+      var vm = inputVmFactory();
+      vm.Message = message;
+      return await dialogService.ShowDialogAsync(vm);
+    }
+
+    public async Task<string> ShowPasswordDialogAsync(string message = null)
+    {
+      var vm = passwordVmFactory();
+      vm.Message = message;
       return await dialogService.ShowDialogAsync(vm);
     }
 

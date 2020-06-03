@@ -11,6 +11,7 @@ using CrowdedPrison.Messenger.Encryption.Events;
 using CrowdedPrison.Encryption;
 using Prism.Regions;
 using CrowdedPrison.Wpf.Services;
+using CrowdedPrison.Common;
 
 namespace CrowdedPrison.Wpf.ViewModels
 {
@@ -22,11 +23,15 @@ namespace CrowdedPrison.Wpf.ViewModels
     private readonly AppConfiguration configuration;
     private readonly IGpgDownloader downloader;
     private readonly IShellService shellService;
+    private readonly IFileSystem fileSystem;
+    private readonly IFileSerializer serializer;
+    private readonly ITwoWayEncryption encryption;
 
     public ICommand ConnectCommand { get; }
 
     public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IMainDialogService dialogService,
-      AppConfiguration configuration, IGpgDownloader downloader, IShellService shellService)
+      AppConfiguration configuration, IGpgDownloader downloader, IShellService shellService, IFileSystem fileSystem,
+      IFileSerializer serializer, ITwoWayEncryption encryption)
     {
       this.messenger = messenger;
       this.gpgMessenger = gpgMessenger;
@@ -34,6 +39,9 @@ namespace CrowdedPrison.Wpf.ViewModels
       this.configuration = configuration;
       this.downloader = downloader;
       this.shellService = shellService;
+      this.fileSystem = fileSystem;
+      this.serializer = serializer;
+      this.encryption = encryption;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
@@ -45,19 +53,21 @@ namespace CrowdedPrison.Wpf.ViewModels
       messenger.MessageUnsent += Messenger_MessageUnsent;
       messenger.Typing += Messenger_Typing;
       gpgMessenger.EncryptedMessageReceived += GpgMessenger_EncryptedMessageReceived;
+      shellService.Cloing += ShellService_Cloing;
     }
 
-    private void GpgMessenger_EncryptedMessageReceived(object sender, EncryptedMessageReceivedEventArgs e)
+
+    private async Task SaveSettingsAsync()
     {
-      Debug.WriteLine(e.DecryptedText);
+      await serializer.SerializeAsync(configuration, configuration.SettingsFilePath);
     }
 
     private async Task<bool> DownloadGpgAsync()
     {
-      configuration.GpgPath = downloader.GetGpgPath();
       if (configuration.GpgPath == null)
         configuration.GpgPath = await dialogService.ShowDownloadGpgDialogAsync();
-      else return true;
+      else 
+        return true;
 
       if (configuration.GpgPath == null)
       {
@@ -65,8 +75,38 @@ namespace CrowdedPrison.Wpf.ViewModels
         shellService.Close();
         return false;
       }
+
       await dialogService.ShowMessageDialogAsync("GnuPG installation was successful.");
       return true;
+    }
+
+    private async Task<bool> CheckGpgPasswordAsync()
+    {
+      if (!string.IsNullOrEmpty(configuration.GpgPasswordHash)
+        && encryption.TryDecrypt(configuration.GpgPasswordHash, out _))
+      {
+        return true;
+      }
+
+      while (true)
+      {
+        var password = await dialogService.ShowPasswordDialogAsync("GnuPG Password");
+        if (password == null)
+        {
+          await dialogService.ShowMessageDialogAsync($"{GlobalConstants.AppName} needs GnuPG password to work. Application will be closed.");
+          shellService.Close();
+        }
+
+        var confirmPassword = await dialogService.ShowPasswordDialogAsync("Confirm GnuPG Password");
+        if (confirmPassword != password)
+        {
+          await dialogService.ShowMessageDialogAsync($"Passwords differ. Enter them again.");
+          continue;
+        }
+
+        configuration.GpgPasswordHash = encryption.Encrypt(password);
+        return true;
+      }
     }
 
     private async Task ConnectAsync()
@@ -101,6 +141,26 @@ namespace CrowdedPrison.Wpf.ViewModels
       await dialogService.HideSpinnerDialogAsync();
     }
 
+    private async Task LoadSettingsAsync()
+    {
+      configuration.HomeDir = fileSystem.GetHomeDirectoryPath(GlobalConstants.AppName);
+      configuration.GpgPath = downloader.GetGpgPath();
+      configuration.SettingsFilePath = fileSystem.CombinePaths(configuration.HomeDir, "settings.dat");
+
+      var deserialized = await serializer.DeserializeAsync<AppConfiguration>(configuration.SettingsFilePath);
+      configuration.GpgPasswordHash = deserialized?.GpgPasswordHash;
+      configuration.MessengerEmail = deserialized?.MessengerEmail;
+    }
+
+    private async void ShellService_Cloing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      await SaveSettingsAsync();
+    }
+
+    private void GpgMessenger_EncryptedMessageReceived(object sender, EncryptedMessageReceivedEventArgs e)
+    {
+      Debug.WriteLine(e.DecryptedText);
+    }
 
     private void Messenger_Typing(object sender, TypingEventArgs e)
     {
@@ -117,13 +177,16 @@ namespace CrowdedPrison.Wpf.ViewModels
       await HideSpinnerAsync();
       (e.Email, e.Password) = await dialogService.ShowLoginDialogAsync(configuration.MessengerEmail);
       e.IsCancelled = e.Email == null;
+
+      if (!e.IsCancelled) configuration.MessengerEmail = e.Email;
+
       ShowSpinner();
     }
 
     private async Task Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
     {
       await HideSpinnerAsync();
-      e.TwoFactorCode = await dialogService.ShowTwoFactorDialogAsync();
+      e.TwoFactorCode = await dialogService.ShowInputDialogAsync("Two factor code");
       e.IsCancelled = e.TwoFactorCode == null;
       ShowSpinner();
     }
@@ -145,7 +208,8 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     public async void OnNavigatedTo(NavigationContext navigationContext)
     {
-      if (await DownloadGpgAsync()) await ConnectAsync();
+      await LoadSettingsAsync();
+      if (await CheckGpgPasswordAsync() && await DownloadGpgAsync()) await ConnectAsync();
     }
 
     public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -155,6 +219,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     public void OnNavigatedFrom(NavigationContext navigationContext)
     {
+
     }
   }
 }

@@ -14,23 +14,33 @@ namespace CrowdedPrison.Messenger.Encryption
     private readonly IPgpRegexHelper pgpHelper;
     private readonly IMessenger messenger;
     private readonly IGpgMessengerConfiguration configuration;
+    private readonly ITwoWayEncryption encryption;
 
     public event EventHandler<EncryptedMessageReceivedEventArgs> EncryptedMessageReceived;
 
 
-    public GpgMessenger(IGpg gpg, IPgpRegexHelper pgpHelper, IMessenger messenger, IGpgMessengerConfiguration configuration)
+    public GpgMessenger(IGpg gpg, IPgpRegexHelper pgpHelper, IMessenger messenger, IGpgMessengerConfiguration configuration,
+      ITwoWayEncryption encryption)
     { 
       this.gpg = gpg;
       this.pgpHelper = pgpHelper;
       this.messenger = messenger;
       this.configuration = configuration;
+      this.encryption = encryption;
 
       messenger.MessageReceived += Messenger_MessageReceived;
     }
 
     public async Task<bool> GeneratePrivateKey()
     {
-      return await gpg.GenerateKeyAsync(messenger.Self.Id, configuration.GpgPassword);
+      return await gpg.GenerateKeyAsync(messenger.Self.Id, GetGpgPassword());
+    }
+
+    private string GetGpgPassword()
+    {
+      if (string.IsNullOrEmpty(configuration.GpgPasswordHash)) throw new InvalidOperationException("Gpg password is missing.");
+
+      return encryption.Decrypt(configuration.GpgPasswordHash);
     }
 
     public async Task<string> GetPublicKeyAsync(MessengerUser user)
@@ -69,7 +79,7 @@ namespace CrowdedPrison.Messenger.Encryption
       if (string.IsNullOrEmpty(encrypted)) 
         return;
 
-      var decrypted = await gpg.DecryptAsync(encrypted, configuration.GpgPassword);
+      var decrypted = await gpg.DecryptAsync(encrypted, GetGpgPassword());
       if (!string.IsNullOrEmpty(decrypted))
         OnEncryptedMessageReceived(decrypted, e.User, e.Message, e.ReplyTo);
     }
