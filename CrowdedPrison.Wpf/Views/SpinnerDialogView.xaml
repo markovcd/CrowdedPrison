@@ -1,12 +1,12 @@
 ﻿<UserControl
-  x:Class="CrowdedPrison.Wpf.Views.MessageDialogView"
+  x:Class="CrowdedPrison.Wpf.Views.SpinnerDialogView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:viewModels="clr-namespace:CrowdedPrison.Wpf.ViewModels"
   MinHeight="140"
-  d:DataContext="{d:DesignInstance viewModels:MessageDialogViewModel}"
+  d:DataContext="{d:DesignInstance viewModels:SpinnerDialogViewModel}"
   d:DesignHeight="140"
   d:DesignWidth="300"
   x:ClassModifier="internal"
@@ -19,14 +19,13 @@
       Text="{Binding Message}"
       TextAlignment="Center"
       TextWrapping="Wrap" />
-    <Button
-      Width="80"
+
+    <ProgressBar
+      Width="32"
       Height="32"
       Margin="10"
       VerticalAlignment="Bottom"
-      Command="{Binding ButtonPressCommand}"
-      CommandParameter="{x:Static viewModels:Buttons.Ok}"
-      Content="OK"
-      Visibility="{Binding IsOkButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      IsIndeterminate="True"
+      Style="{StaticResource MaterialDesignCircularProgressBar}" />
   </Grid>
 </UserControl>

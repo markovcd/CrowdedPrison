@@ -45,6 +45,7 @@ namespace CrowdedPrison.Wpf
       DialogService.Register<TwoFactorDialogViewModel, TwoFactorDialogView>();
       DialogService.Register<DownloadGpgDialogViewModel, DownloadGpgDialogView>();
       DialogService.Register<MessageDialogViewModel, MessageDialogView>();
+      DialogService.Register<SpinnerDialogViewModel, SpinnerDialogView>();
     }
 
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

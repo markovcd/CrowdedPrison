@@ -39,5 +39,24 @@ namespace CrowdedPrison.Messenger
       if (WriteCookiesToDiskCallback != null)
         await WriteCookiesToDiskCallback(cookieJar);    
     }
+
+    public new async Task<Session> DoLogin(string email, string password)
+    {
+      try
+      {
+        var session = await login(email, password);
+        await WriteCookiesAsync();
+        return session;
+      }
+      catch (OperationCanceledException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        Log(ex.ToString());
+        return null;
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 ﻿namespace CrowdedPrison.Wpf.Views
 {
-  public partial class DownloadGpgDialogView
+  internal partial class DownloadGpgDialogView
   {
     public DownloadGpgDialogView()
     {

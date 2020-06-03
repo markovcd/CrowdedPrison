@@ -52,23 +52,54 @@ namespace CrowdedPrison.Wpf.ViewModels
       Debug.WriteLine(e.DecryptedText);
     }
 
-    public async Task DownloadGpgAsync()
+    private async Task DownloadGpgAsync()
     {
       configuration.GpgPath = downloader.GetGpgPath();
       if (configuration.GpgPath == null)
         configuration.GpgPath = await dialogService.ShowDownloadGpgDialogAsync();
+      else return;
 
       if (configuration.GpgPath == null)
       {
         await dialogService.ShowMessageDialogAsync("Error during GnuPG installation. Application will be closed.");
         shellService.Close();
       }
+      else
+      {
+        await dialogService.ShowMessageDialogAsync("GnuPG installation was successful.");
+      }
     }
 
     private async Task ConnectAsync()
     {
-      await messenger.LoginAsync();
+      bool success;
+
+      try
+      {
+        ShowSpinner();
+        success = await messenger.LoginAsync();
+      }
+      catch (OperationCanceledException)
+      {
+        success = true;
+      }
      
+      finally
+      {
+        await HideSpinnerAsync();
+      }
+
+      if (!success) await dialogService.ShowMessageDialogAsync("Login to Facebook failed. Make sure you entered correct password or two factor code.");
+    }
+
+    private void ShowSpinner()
+    {
+      dialogService.ShowSpinnerDialogAsync();
+    }
+
+    private async Task HideSpinnerAsync()
+    {
+      await dialogService.HideSpinnerDialogAsync();
     }
 
 
@@ -84,14 +115,18 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private async Task Messenger_UserLoginRequested(object sender, UserLoginEventArgs e)
     {
+      await HideSpinnerAsync();
       (e.Email, e.Password) = await dialogService.ShowLoginDialogAsync(configuration.MessengerEmail);
       e.IsCancelled = e.Email == null;
+      ShowSpinner();
     }
 
     private async Task Messenger_TwoFactorRequested(object sender, TwoFactorEventArgs e)
     {
+      await HideSpinnerAsync();
       e.TwoFactorCode = await dialogService.ShowTwoFactorDialogAsync();
       e.IsCancelled = e.TwoFactorCode == null;
+      ShowSpinner();
     }
 
     private void Messenger_MessagesDelivered(object sender, MessagesDeliveredEventArgs e)
@@ -109,7 +144,7 @@ namespace CrowdedPrison.Wpf.ViewModels
       Debug.WriteLine($"{e.State} {e.Reason}");
     }
 
-    public async void OnNavigatedTo(NavigationContext navigationContext)
+    public void OnNavigatedTo(NavigationContext navigationContext)
     {
       DownloadGpgAsync();
     }

@@ -1,8 +1,8 @@
 ﻿namespace CrowdedPrison.Wpf.Views
 {
-  internal partial class LoginDialogView
+  internal partial class SpinnerDialogView
   {
-    public LoginDialogView()
+    public SpinnerDialogView()
     {
       InitializeComponent();
     }

@@ -1,6 +1,6 @@
 ﻿namespace CrowdedPrison.Wpf.Views
 {
-  public partial class MessageDialogView
+  internal partial class MessageDialogView
   {
     public MessageDialogView()
     {

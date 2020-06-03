@@ -46,7 +46,7 @@ namespace CrowdedPrison.Messenger
         WriteCookiesToDiskCallback = OnWriteCookiesToDiskCallback
      };     
     }
-
+    
     public async Task<bool> CheckConnectionStateAsync()
     {
       if (session == null) return false;
@@ -59,8 +59,7 @@ namespace CrowdedPrison.Messenger
       if (session == null)
       {
         var (email, password) = await OnUserLoginRequestedAsync();
-        session = await messenger.DoLogin(email, password) 
-                  ?? await messenger.DoLogin(email, password);
+        session = await messenger.DoLogin(email, password);
       }
 
       if (!await CheckConnectionStateAsync())

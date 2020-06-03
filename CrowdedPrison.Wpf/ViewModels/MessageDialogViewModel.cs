@@ -13,7 +13,7 @@ namespace CrowdedPrison.Wpf.ViewModels
     Yes = 1 << 2,
     No = 1 << 3
   }
-  
+
   internal class MessageDialogViewModel : BaseDialogViewModel<Buttons>
   {
     private string message;

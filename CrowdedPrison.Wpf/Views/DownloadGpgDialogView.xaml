@@ -5,28 +5,36 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:viewModels="clr-namespace:CrowdedPrison.Wpf.ViewModels"
+  MinHeight="140"
   d:DataContext="{d:DesignInstance viewModels:DownloadGpgDialogViewModel}"
-  d:DesignHeight="450"
-  d:DesignWidth="800"
+  d:DesignHeight="140"
+  d:DesignWidth="300"
+  x:ClassModifier="internal"
   mc:Ignorable="d">
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
-  <Grid>
+  <Grid Margin="10">
+    <TextBlock
+      MaxWidth="250"
+      Margin="10"
+      VerticalAlignment="Top"
+      Text="GnuPG needs to be downloaded and installed in order to encryption to work."
+      TextAlignment="Center"
+      TextWrapping="Wrap" />
     <Button
-      Width="100"
-      Height="100"
+      Width="80"
+      Height="32"
+      Margin="10"
+      VerticalAlignment="Bottom"
       Command="{Binding DownloadCommand}"
-      Content="Download"
+      Content="OK"
       Visibility="{Binding IsDownloading, Converter={StaticResource InverseBoolToVisConverter}}" />
 
-      <ProgressBar
-        IsIndeterminate="True"
-        Style="{StaticResource MaterialDesignCircularProgressBar}"
-        Visibility="{Binding IsDownloading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    <ProgressBar
+      Width="32"
+      Height="32"
+      Margin="10"
+      VerticalAlignment="Bottom"
+      IsIndeterminate="True"
+      Style="{StaticResource MaterialDesignCircularProgressBar}"
+      Visibility="{Binding IsDownloading, Converter={StaticResource BooleanToVisibilityConverter}}" />
   </Grid>
 </UserControl>
