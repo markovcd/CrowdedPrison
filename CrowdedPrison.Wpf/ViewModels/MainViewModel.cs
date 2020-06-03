@@ -52,22 +52,21 @@ namespace CrowdedPrison.Wpf.ViewModels
       Debug.WriteLine(e.DecryptedText);
     }
 
-    private async Task DownloadGpgAsync()
+    private async Task<bool> DownloadGpgAsync()
     {
       configuration.GpgPath = downloader.GetGpgPath();
       if (configuration.GpgPath == null)
         configuration.GpgPath = await dialogService.ShowDownloadGpgDialogAsync();
-      else return;
+      else return true;
 
       if (configuration.GpgPath == null)
       {
         await dialogService.ShowMessageDialogAsync("Error during GnuPG installation. Application will be closed.");
         shellService.Close();
+        return false;
       }
-      else
-      {
-        await dialogService.ShowMessageDialogAsync("GnuPG installation was successful.");
-      }
+      await dialogService.ShowMessageDialogAsync("GnuPG installation was successful.");
+      return true;
     }
 
     private async Task ConnectAsync()
@@ -144,9 +143,9 @@ namespace CrowdedPrison.Wpf.ViewModels
       Debug.WriteLine($"{e.State} {e.Reason}");
     }
 
-    public void OnNavigatedTo(NavigationContext navigationContext)
+    public async void OnNavigatedTo(NavigationContext navigationContext)
     {
-      DownloadGpgAsync();
+      if (await DownloadGpgAsync()) await ConnectAsync();
     }
 
     public bool IsNavigationTarget(NavigationContext navigationContext)
