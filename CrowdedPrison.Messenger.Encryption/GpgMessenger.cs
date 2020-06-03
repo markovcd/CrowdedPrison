@@ -18,6 +18,8 @@ namespace CrowdedPrison.Messenger.Encryption
     private readonly IKeyListParser keyListParser;
     public event EventHandler<EncryptedMessageReceivedEventArgs> EncryptedMessageReceived;
 
+    private IReadOnlyList<GpgKey> PrivateKeys { get; set; }
+    private IReadOnlyList<GpgKey> PublicKeys { get; set; }
 
     public GpgMessenger(IGpg gpg, IPgpRegexHelper pgpHelper, IMessenger messenger, IGpgMessengerConfiguration configuration,
       ITwoWayEncryption encryption, IKeyListParser keyListParser)
@@ -32,15 +34,35 @@ namespace CrowdedPrison.Messenger.Encryption
       messenger.MessageReceived += Messenger_MessageReceived;
     }
 
+    private async Task RefreshKeys(bool secret = false)
+    {
+      var keys = await GetKeysAsync(secret);
+
+      if (secret) PrivateKeys = keys ?? PrivateKeys;
+      else PublicKeys = keys ?? PublicKeys;
+    }
+
     public async Task<bool> GeneratePrivateKeyAsync()
     {
-      return await gpg.GenerateKeyAsync(messenger.Self.Id, GetGpgPassword());
+      var result = await gpg.GenerateKeyAsync(messenger.Self.Id, GetGpgPassword());
+      if (!result) return false;
+
+      await RefreshKeys();
+      await RefreshKeys(true);
+
+      return true;
     }
 
     public async Task<bool> IsPrivateKeyPresentAsync()
     {
       var key = await GetPrivateKeyAsync();
       return key != null;  
+    }
+
+    public async Task<bool> IsKeyPresentAsync(MessengerUser user)
+    {
+      var key = await GetKeyAsync(user);
+      return key != null;
     }
 
     private string GetGpgPassword()
@@ -71,7 +93,11 @@ namespace CrowdedPrison.Messenger.Encryption
     {
       var publicKey = await GetPublicKeyAsync(user);
       if (string.IsNullOrEmpty(publicKey)) return false;
-      return await gpg.ImportKeyAsync(publicKey);
+      var result = await gpg.ImportKeyAsync(publicKey);
+      if (!result) return false;
+
+      await RefreshKeys();
+      return true;
     }
 
     public async Task<bool> SendEncryptedTextAsync(MessengerUser user, string text)
@@ -80,10 +106,30 @@ namespace CrowdedPrison.Messenger.Encryption
       return await messenger.SendTextAsync(user, encrypted);
     }
 
+    private async Task<IReadOnlyList<GpgKey>> GetKeysAsync(bool secret = false)
+    {
+      var data = await gpg.ListKeysAsync(secret);
+      return keyListParser.GpgKeysFromData(data);
+    }
+
+    private async Task<GpgKey> GetPrivateKeyAsync()
+    {
+      return await GetKeyAsync(messenger.Self, true);
+    }
+
+    private async Task<GpgKey> GetKeyAsync(MessengerUser user, bool secret = false)
+    {
+      var keys = secret ? PrivateKeys : PublicKeys;
+      if (keys == null) await RefreshKeys(secret);
+      keys = secret ? PrivateKeys : PublicKeys;
+
+      return keys.FirstOrDefault(k => k.UserId == user.Id);
+    }
+
     private async void Messenger_MessageReceived(object sender, Messenger.Events.MessageReceivedEventArgs e)
     {
       var encrypted = pgpHelper.GetMessageBlock(e.Message.Text);
-      if (string.IsNullOrEmpty(encrypted)) 
+      if (string.IsNullOrEmpty(encrypted))
         return;
 
       var decrypted = await gpg.DecryptAsync(encrypted, GetGpgPassword());
@@ -97,16 +143,5 @@ namespace CrowdedPrison.Messenger.Encryption
       EncryptedMessageReceived?.Invoke(this, args);
     }
 
-    private async Task<IReadOnlyList<GpgKey>> GetKeysAsync(bool secret = false)
-    {
-      var data = await gpg.ListKeysAsync(secret);
-      return keyListParser.GpgKeysFromData(data);
-    }
-
-    private async Task<GpgKey> GetPrivateKeyAsync()
-    {
-      var keys = await GetKeysAsync(true);
-      return keys.FirstOrDefault(k => k.UserId == messenger.Self.Id);
-    }
   }
 }
