@@ -94,7 +94,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     private void ShowSpinner()
     {
-      dialogService.ShowSpinnerDialogAsync();
+      dialogService.ShowSpinnerDialogAsync("Logging in...");
     }
 
     private async Task HideSpinnerAsync()

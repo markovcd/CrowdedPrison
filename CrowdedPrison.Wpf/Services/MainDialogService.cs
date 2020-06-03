@@ -47,9 +47,10 @@ namespace CrowdedPrison.Wpf.Services
       return await dialogService.ShowDialogAsync(vm);
     }
 
-    public Task ShowSpinnerDialogAsync()
+    public Task ShowSpinnerDialogAsync(string message)
     {
       spinnerVm = spinnerVmFactory();
+      spinnerVm.Message = message;
       spinnerTask = dialogService.ShowDialogAsync(spinnerVm);
       return spinnerTask;
     }

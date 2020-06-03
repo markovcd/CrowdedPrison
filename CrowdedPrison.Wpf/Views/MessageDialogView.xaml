@@ -27,6 +27,7 @@
       Command="{Binding ButtonPressCommand}"
       CommandParameter="{x:Static viewModels:Buttons.Ok}"
       Content="OK"
+      IsDefault="True"
       Visibility="{Binding IsOkButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
   </Grid>
 </UserControl>

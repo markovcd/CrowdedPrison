@@ -37,13 +37,15 @@
         Margin="10,0"
         Command="{Binding OkCommand}"
         CommandParameter="{Binding ., ElementName=PasswordBox}"
-        Content="Ok" />
+        Content="Ok"
+        IsDefault="True" />
       <Button
         Width="80"
         Height="32"
         Margin="10,0"
         Command="{Binding CancelCommand}"
-        Content="Cancel" />
+        Content="Cancel"
+        IsCancel="True" />
     </StackPanel>
   </Grid>
 </UserControl>

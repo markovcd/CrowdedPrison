@@ -9,7 +9,7 @@ namespace CrowdedPrison.Wpf.Services
     Task<string> ShowTwoFactorDialogAsync();
     Task<string> ShowDownloadGpgDialogAsync();
     Task<Buttons> ShowMessageDialogAsync(string message, Buttons buttons = Buttons.Ok);
-    Task ShowSpinnerDialogAsync();
+    Task ShowSpinnerDialogAsync(string message);
     Task HideSpinnerDialogAsync();
   }
 }

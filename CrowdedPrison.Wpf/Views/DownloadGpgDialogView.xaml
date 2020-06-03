@@ -26,6 +26,7 @@
       VerticalAlignment="Bottom"
       Command="{Binding DownloadCommand}"
       Content="OK"
+      IsDefault="True"
       Visibility="{Binding IsDownloading, Converter={StaticResource InverseBoolToVisConverter}}" />
 
     <ProgressBar
