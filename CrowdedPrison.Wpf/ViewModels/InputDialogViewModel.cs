@@ -5,7 +5,7 @@ namespace CrowdedPrison.Wpf.ViewModels
 {
   internal class InputDialogViewModel : BaseDialogViewModel<string>
   {
-    private string value;
+    private string val;
     private string message;
 
     public ICommand OkCommand { get; }
@@ -13,8 +13,8 @@ namespace CrowdedPrison.Wpf.ViewModels
 
     public string Value
     {
-      get => value;
-      set => base.SetProperty(ref value, value);
+      get => val;
+      set => SetProperty(ref val, value);
     }
 
     public string Message
