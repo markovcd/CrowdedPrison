@@ -19,6 +19,7 @@ namespace CrowdedPrison.Messenger
     private readonly IFileSerializer serializer;
     private readonly BaseClient messenger;
     private Session session;
+    private Dictionary<string, MessengerUser> users;
 
     private string SessionFilePath 
     {
@@ -37,7 +38,7 @@ namespace CrowdedPrison.Messenger
     public event EventHandler<MessageUnsentEventArgs> MessageUnsent;
     public event EventHandler<TypingEventArgs> Typing;
 
-    public IReadOnlyDictionary<string, MessengerUser> Users { get; private set; }
+    public IReadOnlyDictionary<string, MessengerUser> Users => users;
     public MessengerUser Self { get; private set; }
 
     public MessengerWrapper(IMessengerConfiguration configuration, IFileSerializer serializer)
@@ -140,7 +141,7 @@ namespace CrowdedPrison.Messenger
     public async Task UpdateUsersAsync()
     {
       var users = await messenger.fetchUsers();
-      Users = users.Select(u => new MessengerUser(u)).ToImmutableDictionary(u => u.Id);
+      this.users = users.Select(u => new MessengerUser(u)).ToDictionary(u => u.Id);
     }
 
     public async Task<IReadOnlyList<MessengerThread>> GetThreadsAsync(int limit = 20)
@@ -265,7 +266,14 @@ namespace CrowdedPrison.Messenger
     {
       if (author == null) return null;
 
-      return GetUser(author.uid) ?? new MessengerUser(author);      
+      var user = GetUser(author.uid);
+      if (user == null) 
+      { 
+        user = new MessengerUser(author);
+        users.Add(user.Id, user);
+      }
+
+      return user;
     }
 
     private async Task OnWriteCookiesToDiskCallback(Dictionary<string, List<Cookie>> cookieJar)

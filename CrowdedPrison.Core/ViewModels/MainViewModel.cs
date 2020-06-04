@@ -12,6 +12,9 @@ using CrowdedPrison.Encryption;
 using Prism.Regions;
 using CrowdedPrison.Core.Services;
 using CrowdedPrison.Common;
+using System.Collections.ObjectModel;
+using System.Linq;
+using CrowdedPrison.Messenger.Entities;
 
 namespace CrowdedPrison.Core.ViewModels
 {
@@ -26,12 +29,15 @@ namespace CrowdedPrison.Core.ViewModels
     private readonly IFileSystem fileSystem;
     private readonly IFileSerializer serializer;
     private readonly ITwoWayEncryption encryption;
+    private readonly Func<IUserViewModel> userViewModelFactory;
 
     public ICommand ConnectCommand { get; }
 
+    public ObservableCollection<IUserViewModel> Users { get; } = new ObservableCollection<IUserViewModel>();
+
     public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IMainDialogService dialogService,
       AppConfiguration configuration, IGpgDownloader downloader, IShellService shellService, IFileSystem fileSystem,
-      IFileSerializer serializer, ITwoWayEncryption encryption)
+      IFileSerializer serializer, ITwoWayEncryption encryption, Func<IUserViewModel> userViewModelFactory)
     {
       this.messenger = messenger;
       this.gpgMessenger = gpgMessenger;
@@ -42,6 +48,7 @@ namespace CrowdedPrison.Core.ViewModels
       this.fileSystem = fileSystem;
       this.serializer = serializer;
       this.encryption = encryption;
+      this.userViewModelFactory = userViewModelFactory;
 
       ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
@@ -150,7 +157,20 @@ namespace CrowdedPrison.Core.ViewModels
 
       if (!success && !cancelled) await dialogService.ShowMessageDialogAsync("Login to Facebook failed. Make sure you entered correct password or two factor code.");
 
+      if (success)
+      {
+        var userVms = messenger.Users.Values.Select(CreateUserViewModel);
+        Users.AddRange(userVms);
+      }
+
       return success;    
+    }
+
+    private IUserViewModel CreateUserViewModel(MessengerUser user)
+    {
+      var vm = userViewModelFactory();
+      vm.User = user;
+      return vm;
     }
 
     private void ShowSpinner()
