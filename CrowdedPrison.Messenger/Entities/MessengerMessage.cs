@@ -14,6 +14,14 @@ namespace CrowdedPrison.Messenger.Entities
     public bool IsRead { get; }
     public bool IsUnsent { get; }
 
+    public MessengerMessage(string authorId, string text, DateTime timestamp, string threadId)
+    {
+      AuthorId = authorId;
+      Text = text;
+      Timestamp = timestamp;
+      ThreadId = threadId;
+    }
+
     internal MessengerMessage(FB_Message message)
     {
       Text = message.text;

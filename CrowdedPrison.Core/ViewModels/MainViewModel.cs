@@ -30,10 +30,22 @@ namespace CrowdedPrison.Core.ViewModels
     private readonly IFileSerializer serializer;
     private readonly ITwoWayEncryption encryption;
     private readonly Func<IUserViewModel> userViewModelFactory;
-
-    public ICommand ConnectCommand { get; }
+    private IUserViewModel selectedUser;
 
     public ObservableCollection<IUserViewModel> Users { get; } = new ObservableCollection<IUserViewModel>();
+    public IUserViewModel SelectedUser
+    {
+      get => selectedUser;
+      set 
+      {
+        var oldSelectedUser = selectedUser;
+        if (SetProperty(ref selectedUser, value))
+        {
+          oldSelectedUser?.ClearMessages();
+          value?.RefreshMessagesAsync(); 
+        }
+      }
+    }
 
     public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IMainDialogService dialogService,
       AppConfiguration configuration, IGpgDownloader downloader, IShellService shellService, IFileSystem fileSystem,
@@ -49,8 +61,6 @@ namespace CrowdedPrison.Core.ViewModels
       this.serializer = serializer;
       this.encryption = encryption;
       this.userViewModelFactory = userViewModelFactory;
-
-      ConnectCommand = new DelegateCommand(() => ConnectAsync());
 
       messenger.ConnectionStateChanged += Messenger_ConnectionStateChanged;
       messenger.MessageReceived += Messenger_MessageReceived;
@@ -160,6 +170,7 @@ namespace CrowdedPrison.Core.ViewModels
       if (success)
       {
         var userVms = messenger.Users.Values.Select(CreateUserViewModel);
+        Users.Clear();
         Users.AddRange(userVms);
       }
 

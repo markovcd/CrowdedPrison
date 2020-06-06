@@ -3,6 +3,7 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:CrowdedPrison.Wpf.Views"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:p="http://prismlibrary.com/"
   xmlns:viewModels="clr-namespace:CrowdedPrison.Core.ViewModels;assembly=CrowdedPrison.Core"
@@ -12,8 +13,20 @@
   p:ViewModelLocator.AutoWireViewModel="True"
   x:ClassModifier="internal"
   mc:Ignorable="d">
-  <StackPanel>
-    <Button Command="{Binding ConnectCommand}" Content="Connect" />
-    <Button Command="{Binding DisconnectCommand}" Content="Disconnect" />
-  </StackPanel>
+  <DockPanel>
+    <ListView ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}">
+      <ListView.ItemTemplate>
+        <DataTemplate DataType="{x:Type viewModels:UserViewModel}">
+          <local:UserView />
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+    <ContentControl Content="{Binding SelectedUser}">
+      <ContentControl.ContentTemplate>
+        <DataTemplate DataType="{x:Type viewModels:UserViewModel}">
+          <local:ChatView />
+        </DataTemplate>
+      </ContentControl.ContentTemplate>
+    </ContentControl>
+  </DockPanel>
 </UserControl>

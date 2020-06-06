@@ -27,6 +27,7 @@ namespace CrowdedPrison.Encryption
 
     private static string GetBlock(string text, Regex regex)
     {
+      if (text == null) return null;
       var match = regex.Match(text);
       return match.Success ? match.Value : null;
     }
