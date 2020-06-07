@@ -72,12 +72,18 @@ namespace CrowdedPrison.Messenger.Encryption
       return encryption.Decrypt(configuration.GpgPasswordHash);
     }
 
+    public async Task<string> LoadPublicKeyAsync(MessengerUser user)
+    {
+      return await gpg.ExportKeyAsync(user.Id);
+    }
+
     public async Task<string> GetPublicKeyAsync(MessengerUser user)
     {
       const string pattern = "-----BEGIN PGP PUBLIC KEY BLOCK----- -----END PGP PUBLIC KEY BLOCK-----";
       var messages = await messenger.SearchThreadAsync(user, pattern, 50);
       
       return messages
+        .Where(m => m.AuthorId == user.Id)
         .OrderByDescending(m => m.Timestamp)
         .Select(m => pgpHelper.GetPublicKeyBlock(m.Text))
         .FirstOrDefault(s => !string.IsNullOrEmpty(s));
@@ -103,6 +109,7 @@ namespace CrowdedPrison.Messenger.Encryption
     public async Task<bool> SendEncryptedTextAsync(MessengerUser user, string text)
     {
       var encrypted = await gpg.EncryptAsync(text, user.Id);
+      if (string.IsNullOrEmpty(encrypted)) return false;
       return await messenger.SendTextAsync(user, encrypted);
     }
 

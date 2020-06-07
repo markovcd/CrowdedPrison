@@ -10,7 +10,7 @@ namespace CrowdedPrison.Messenger
 
   public interface IMessenger : IAsyncDisposable
   {
-    IReadOnlyDictionary<string, MessengerUser> Users { get; }
+    IReadOnlyList<MessengerUser> Users { get; }
     MessengerUser Self { get; }
 
     event AsyncEventHandler<TwoFactorEventArgs> TwoFactorRequested;

@@ -41,8 +41,8 @@ namespace CrowdedPrison.Core.ViewModels
         var oldSelectedUser = selectedUser;
         if (SetProperty(ref selectedUser, value))
         {
-          oldSelectedUser?.ClearMessages();
-          value?.RefreshMessagesAsync(); 
+          oldSelectedUser?.ChatClosed();
+          value?.ChatOpened();
         }
       }
     }
@@ -169,7 +169,7 @@ namespace CrowdedPrison.Core.ViewModels
 
       if (success)
       {
-        var userVms = messenger.Users.Values.Select(CreateUserViewModel);
+        var userVms = messenger.Users.Select(CreateUserViewModel);
         Users.Clear();
         Users.AddRange(userVms);
       }
@@ -259,7 +259,7 @@ namespace CrowdedPrison.Core.ViewModels
       Debug.WriteLine($"{e.State} {e.Reason}");
     }
 
-    public async void OnNavigatedTo(NavigationContext navigationContext)
+    public void OnNavigatedTo(NavigationContext navigationContext)
     {
       Init();
     }

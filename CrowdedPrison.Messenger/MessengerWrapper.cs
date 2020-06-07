@@ -19,7 +19,7 @@ namespace CrowdedPrison.Messenger
     private readonly IFileSerializer serializer;
     private readonly BaseClient messenger;
     private Session session;
-    private Dictionary<string, MessengerUser> users;
+    private List<MessengerUser> users;
 
     private string SessionFilePath 
     {
@@ -38,7 +38,7 @@ namespace CrowdedPrison.Messenger
     public event EventHandler<MessageUnsentEventArgs> MessageUnsent;
     public event EventHandler<TypingEventArgs> Typing;
 
-    public IReadOnlyDictionary<string, MessengerUser> Users => users;
+    public IReadOnlyList<MessengerUser> Users => users;
     public MessengerUser Self { get; private set; }
 
     public MessengerWrapper(IMessengerConfiguration configuration, IFileSerializer serializer)
@@ -141,7 +141,7 @@ namespace CrowdedPrison.Messenger
     public async Task UpdateUsersAsync()
     {
       var users = await messenger.fetchUsers();
-      this.users = users.Select(u => new MessengerUser(u)).ToDictionary(u => u.Id);
+      this.users = users.Select(u => new MessengerUser(u)).ToList();
     }
 
     public async Task<IReadOnlyList<MessengerThread>> GetThreadsAsync(int limit = 20)
@@ -254,7 +254,8 @@ namespace CrowdedPrison.Messenger
 
     private MessengerUser GetUser(string id)
     {
-      if (Users.TryGetValue(id, out var user))
+      var user = Users.FirstOrDefault(u => u.Id == id);
+      if (user != null)
         return user;
       
       return Self?.Id == id 
@@ -270,7 +271,7 @@ namespace CrowdedPrison.Messenger
       if (user == null) 
       { 
         user = new MessengerUser(author);
-        users.Add(user.Id, user);
+        users.Add(user);
       }
 
       return user;

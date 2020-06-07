@@ -15,5 +15,6 @@ namespace CrowdedPrison.Messenger.Encryption
     Task<bool> SendPublicKeyAsync(MessengerUser user);
     Task<bool> ImportPublicKeyAsync(MessengerUser user);
     Task<bool> SendEncryptedTextAsync(MessengerUser user, string text);
+    Task<string> LoadPublicKeyAsync(MessengerUser user);
   }
 }

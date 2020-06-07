@@ -6,7 +6,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CrowdedPrison.Core.ViewModels
@@ -18,6 +17,8 @@ namespace CrowdedPrison.Core.ViewModels
 
     private readonly IGpgMessenger gpgMessenger;
     private readonly IMessenger messenger;
+
+    public string PublicKey { get; private set; }
 
     public MessengerUser User
     {
@@ -34,10 +35,10 @@ namespace CrowdedPrison.Core.ViewModels
       this.gpgMessenger = gpgMessenger;
       this.messenger = messenger;
 
-      SendMessageCommand = new DelegateCommand<string>(SendMessage);
+      SendMessageCommand = new DelegateCommand<string>(SendEncryptedMessage);
     }
 
-    public async Task RefreshMessagesAsync(int limit = 20)
+    public async void RefreshMessages(int limit = 20)
     {
       ClearMessages();
       var messages = await messenger.GetMessagesAsync(User, limit);
@@ -49,11 +50,41 @@ namespace CrowdedPrison.Core.ViewModels
       Messages.Clear();
     }
 
-    public async void SendMessage(string message)
+    public async void SendEncryptedMessage(string message)
     {
-      if (!await messenger.SendTextAsync(User, message)) return;
-      var m = new MessengerMessage(null, message, DateTime.Now, user.Id);
+      if (!await gpgMessenger.IsKeyPresentAsync(User))
+        return;
+
+      if (!await gpgMessenger.SendEncryptedTextAsync(User, message))
+        return;
+
+      var m = new MessengerMessage(messenger.Self.Id, message, DateTime.Now, User.Id);
       Messages.Add(m);
+    }
+
+    public void ChatOpened()
+    {
+      RefreshMessages();
+      LoadPublicKey();
+    }
+
+    public async void LoadPublicKey()
+    {
+      if (string.IsNullOrEmpty(PublicKey))
+      {
+        if (await gpgMessenger.IsKeyPresentAsync(User))
+          PublicKey = await gpgMessenger.LoadPublicKeyAsync(user);
+        else
+        {
+          var isImported = await gpgMessenger.ImportPublicKeyAsync(user);
+          if (isImported) PublicKey = await gpgMessenger.LoadPublicKeyAsync(user);
+        }
+      }
+    }
+
+    public void ChatClosed()
+    {
+      ClearMessages();
     }
   }
 }
