@@ -49,7 +49,7 @@ namespace CrowdedPrison.Encryption
 
     public Task<bool> EncryptFileAsync(string inputFileName, string outputFileName, string name)
     {
-      return RunCommandAsync($"--armor --output {outputFileName} --encrypt --recipient {name} {inputFileName}");
+      return RunCommandAsync($"--armor --trust-model always --batch --output {outputFileName} --encrypt --recipient {name} {inputFileName}");
     }
 
     public Task<bool> DecryptFileAsync(string inputFileName, string outputFileName, string password)

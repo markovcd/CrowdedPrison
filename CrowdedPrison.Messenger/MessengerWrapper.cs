@@ -402,7 +402,7 @@ namespace CrowdedPrison.Messenger
       var user = GetUser(messagesDeliveredEvent.author);
       var messages = messagesDeliveredEvent.messages?.Select(m => new MessengerMessage(m)).ToImmutableList();
       var thread = new MessengerThread(messagesDeliveredEvent.thread);
-      var at = messagesDeliveredEvent.at.FromUnixEpoch();
+      var at = messagesDeliveredEvent.at.FromUnixEpoch(true);
       OnMessagesDelivered(user, messages, thread, at);
     }
 

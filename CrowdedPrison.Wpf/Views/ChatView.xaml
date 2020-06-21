@@ -21,7 +21,7 @@
       Grid.Row="0"
       DockPanel.Dock="Top"
       Text="{Binding User.Name}" />
-
+    <Button HorizontalAlignment="Right" Content="Send key" Command="{Binding SendPublicKeyCommand}"/>
 
     <ItemsControl Grid.Row="1" ItemsSource="{Binding Messages}">
       <ItemsControl.ItemTemplate>

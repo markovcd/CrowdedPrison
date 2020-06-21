@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Messenger", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Common", "CrowdedPrison.Common\CrowdedPrison.Common.csproj", "{B37543BB-15ED-4312-889D-0970C0207032}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Wpf", "CrowdedPrison.Wpf\CrowdedPrison.Wpf.csproj", "{0BE99865-69DD-40AD-A74B-E6370B83D13E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison", "CrowdedPrison.Wpf\CrowdedPrison.csproj", "{0BE99865-69DD-40AD-A74B-E6370B83D13E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Tests", "CrowdedPrison.Tests\CrowdedPrison.Tests.csproj", "{3B00C00B-6F24-4ED7-A9CB-73456368AEF9}"
 EndProject
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Messenger.Enc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbchat-sharp", "fbchat-sharp\fbchat-sharp\fbchat-sharp.csproj", "{DB5CF1EA-533E-41F9-BB99-F9435E3B64C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrowdedPrison.Core", "CrowdedPrison.Core\CrowdedPrison.Core.csproj", "{7F2E1ECB-F8FB-4CE2-AD93-B9108775C8C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrowdedPrison.Core", "CrowdedPrison.Core\CrowdedPrison.Core.csproj", "{7F2E1ECB-F8FB-4CE2-AD93-B9108775C8C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

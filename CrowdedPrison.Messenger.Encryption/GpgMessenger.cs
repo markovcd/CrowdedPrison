@@ -79,7 +79,7 @@ namespace CrowdedPrison.Messenger.Encryption
 
     public async Task<string> GetPublicKeyAsync(MessengerUser user)
     {
-      const string pattern = "-----BEGIN PGP PUBLIC KEY BLOCK----- -----END PGP PUBLIC KEY BLOCK-----";
+      const string pattern = "-----BEGIN PGP PUBLIC KEY BLOCK-----";
       var messages = await messenger.SearchThreadAsync(user, pattern, 50);
       
       return messages
@@ -135,13 +135,25 @@ namespace CrowdedPrison.Messenger.Encryption
 
     private async void Messenger_MessageReceived(object sender, Messenger.Events.MessageReceivedEventArgs e)
     {
+      if (e.Message.AuthorId == messenger.Self.Id || e.Message.ThreadId != e.Message.AuthorId)
+        return;
+
       var encrypted = pgpHelper.GetMessageBlock(e.Message.Text);
       if (string.IsNullOrEmpty(encrypted))
         return;
 
-      var decrypted = await gpg.DecryptAsync(encrypted, GetGpgPassword());
-      if (!string.IsNullOrEmpty(decrypted))
-        OnEncryptedMessageReceived(decrypted, e.User, e.Message, e.ReplyTo);
+      try
+      {
+        var decrypted = await gpg.DecryptAsync(encrypted, GetGpgPassword());
+
+        if (!string.IsNullOrEmpty(decrypted))
+          OnEncryptedMessageReceived(decrypted, e.User, e.Message, e.ReplyTo);
+      }
+      catch (GpgException)
+      {
+
+      }
+      
     }
 
     protected virtual void OnEncryptedMessageReceived(string decrypted, MessengerUser user, MessengerMessage message, MessengerMessage replyTo = null)

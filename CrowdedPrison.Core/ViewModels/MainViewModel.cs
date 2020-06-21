@@ -15,9 +15,12 @@ using CrowdedPrison.Common;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CrowdedPrison.Messenger.Entities;
+using Prism.Events;
 
 namespace CrowdedPrison.Core.ViewModels
 {
+  public class MessageReceivedEvent : PubSubEvent<MessageReceivedEventArgs> { }
+
   public class MainViewModel : BindableBase, INavigationAware
   {
     private readonly IMessenger messenger;
@@ -30,6 +33,7 @@ namespace CrowdedPrison.Core.ViewModels
     private readonly IFileSerializer serializer;
     private readonly ITwoWayEncryption encryption;
     private readonly Func<IUserViewModel> userViewModelFactory;
+    private readonly IEventAggregator events;
     private IUserViewModel selectedUser;
 
     public ObservableCollection<IUserViewModel> Users { get; } = new ObservableCollection<IUserViewModel>();
@@ -49,7 +53,7 @@ namespace CrowdedPrison.Core.ViewModels
 
     public MainViewModel(IMessenger messenger, IGpgMessenger gpgMessenger, IMainDialogService dialogService,
       AppConfiguration configuration, IGpgDownloader downloader, IShellService shellService, IFileSystem fileSystem,
-      IFileSerializer serializer, ITwoWayEncryption encryption, Func<IUserViewModel> userViewModelFactory)
+      IFileSerializer serializer, ITwoWayEncryption encryption, Func<IUserViewModel> userViewModelFactory, IEventAggregator events)
     {
       this.messenger = messenger;
       this.gpgMessenger = gpgMessenger;
@@ -61,7 +65,7 @@ namespace CrowdedPrison.Core.ViewModels
       this.serializer = serializer;
       this.encryption = encryption;
       this.userViewModelFactory = userViewModelFactory;
-
+      this.events = events;
       messenger.ConnectionStateChanged += Messenger_ConnectionStateChanged;
       messenger.MessageReceived += Messenger_MessageReceived;
       messenger.MessagesDelivered += Messenger_MessagesDelivered;
@@ -251,7 +255,7 @@ namespace CrowdedPrison.Core.ViewModels
 
     private void Messenger_MessageReceived(object sender, MessageReceivedEventArgs e)
     {
-
+      events.GetEvent<MessageReceivedEvent>().Publish(e);
     }
 
     private void Messenger_ConnectionStateChanged(object sender, ConnectionStateEventArgs e)
